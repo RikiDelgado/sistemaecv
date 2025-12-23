@@ -1,3 +1,4 @@
+// backend/src/db.js
 import pkg from "pg";
 import dotenv from "dotenv";
 
@@ -11,10 +12,17 @@ const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port: 5432,
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 pool.on("connect", () => {
-  console.log("🟢 Conectado a PostgreSQL");
+  console.log("🟢 Conectado a PostgreSQL en Render");
+});
+
+pool.on("error", (err) => {
+  console.error("🔴 Error de conexión a PostgreSQL:", err);
 });
 
 export default pool;
