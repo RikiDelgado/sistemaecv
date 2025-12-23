@@ -11,18 +11,18 @@ const pool = new Pool({
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: 5432,
+  port: process.env.DB_PORT || 5432,
   ssl: {
     rejectUnauthorized: false,
   },
 });
 
 pool.on("connect", () => {
-  console.log("🟢 Conectado a PostgreSQL en Render");
+  console.log("🟢 PostgreSQL conectado correctamente");
 });
 
 pool.on("error", (err) => {
-  console.error("🔴 Error de conexión a PostgreSQL:", err);
+  console.error("🔴 Error inesperado en PostgreSQL", err);
 });
 
 export default pool;
