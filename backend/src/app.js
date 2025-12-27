@@ -1,8 +1,9 @@
-//backend/src/app.js
+// backend/src/app.js
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import pool from "./db.js";
+
 import alumnosRoutes from "./routes/alumnos.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import asistenciasRoutes from "./routes/asistencias.routes.js";
@@ -11,15 +12,31 @@ dotenv.config();
 
 const app = express();
 
-// Middlewares básicos
+/* ======================
+   MIDDLEWARES BÁSICOS
+====================== */
+
+// Permitir requests desde el frontend
 app.use(cors());
+
+// Permitir recibir JSON (POST, PUT, etc.)
 app.use(express.json());
+
+// Permitir formularios (por si acaso)
+app.use(express.urlencoded({ extended: true }));
+
+/* ======================
+   RUTAS
+====================== */
 
 app.use("/alumnos", alumnosRoutes);
 app.use("/auth", authRoutes);
 app.use("/asistencias", asistenciasRoutes);
 
-// Ruta de prueba
+/* ======================
+   RUTA DE PRUEBA
+====================== */
+
 app.get("/", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -36,9 +53,12 @@ app.get("/", async (req, res) => {
   }
 });
 
-// Puerto
+/* ======================
+   SERVIDOR
+====================== */
+
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(`🚀 Servidor corriendo en puerto ${PORT}`);
 });

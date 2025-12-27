@@ -13,7 +13,7 @@ const router = express.Router();
 router.post(
   "/",
   authMiddleware,
-  roleMiddleware(["ADMIN", "DOCENTE"]),
+  roleMiddleware(["admin", "docente"]),
   async (req, res) => {
     try {
       const { alumno_id, texto } = req.body;

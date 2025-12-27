@@ -28,7 +28,7 @@ export default function InscripcionECV() {
   const handleSubmit = async (e: any) => {
     e.preventDefault();
 
-    const res = await fetch("https://sistemaecv.onrender.com/alumnos", {
+    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/alumnos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(form),
