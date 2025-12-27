@@ -1,4 +1,3 @@
-//backend/src/app.js
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
@@ -14,10 +13,10 @@ const app = express();
 // Middlewares básicos
 app.use(cors());
 app.use(express.json());
+
 app.use("/alumnos", alumnosRoutes);
 app.use("/auth", authRoutes);
 app.use("/asistencias", asistenciasRoutes);
-
 
 // Ruta de prueba
 app.get("/", async (req, res) => {
@@ -28,7 +27,11 @@ app.get("/", async (req, res) => {
       horaServidor: result.rows[0],
     });
   } catch (error) {
-    res.status(500).json({ error: "Error de conexión a la base de datos" });
+    console.error("❌ ERROR DB:", error.message);
+    res.status(500).json({
+      error: "Error de conexión a la base de datos",
+      detalle: error.message,
+    });
   }
 });
 
