@@ -1,3 +1,4 @@
+//frontend/app/dashboard/alumnos/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";

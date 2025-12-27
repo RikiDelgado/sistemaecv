@@ -1,3 +1,4 @@
+//backend/hash.js
 import bcrypt from "bcryptjs";
 
 const password = "admin123";

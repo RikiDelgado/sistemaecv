@@ -1,3 +1,4 @@
+//backend/src/routes/asistencias.routes.js
 import express from "express";
 import pool from "../db.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
