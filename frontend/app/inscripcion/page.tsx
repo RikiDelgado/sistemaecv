@@ -41,7 +41,11 @@ export default function InscripcionECV() {
       return;
     }
 
-    alert("✅ Inscripción realizada con éxito");
+    alert(
+  "💚 ¡Inscripción realizada con éxito!\n\n" +
+  "Gracias por inscribir a tu hijo/a en la Escuela Cristiana de Vacaciones 2026.\n\n" +
+  "Nos estaremos comunicando pronto con más información.\n" +
+  "¡Que Dios los bendiga! 🙏");
   };
 
   return (

@@ -2,8 +2,8 @@
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
-import pool from "./db.js";
 
+import pool from "./db.js";
 import alumnosRoutes from "./routes/alumnos.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import asistenciasRoutes from "./routes/asistencias.routes.js";
@@ -12,31 +12,31 @@ dotenv.config();
 
 const app = express();
 
-/* ======================
-   MIDDLEWARES BÁSICOS
-====================== */
+/* =====================
+   MIDDLEWARES CLAVE
+===================== */
 
-// Permitir requests desde el frontend
-app.use(cors());
-
-// Permitir recibir JSON (POST, PUT, etc.)
+// ⚠️ ESTE ES EL MÁS IMPORTANTE
 app.use(express.json());
 
-// Permitir formularios (por si acaso)
-app.use(express.urlencoded({ extended: true }));
+// CORS abierto (correcto para Render + Vercel)
+app.use(
+  cors({
+    origin: "*",
+  })
+);
 
-/* ======================
+/* =====================
    RUTAS
-====================== */
+===================== */
 
 app.use("/alumnos", alumnosRoutes);
 app.use("/auth", authRoutes);
 app.use("/asistencias", asistenciasRoutes);
 
-/* ======================
-   RUTA DE PRUEBA
-====================== */
-
+/* =====================
+   RUTA TEST
+===================== */
 app.get("/", async (req, res) => {
   try {
     const result = await pool.query("SELECT NOW()");
@@ -53,10 +53,9 @@ app.get("/", async (req, res) => {
   }
 });
 
-/* ======================
-   SERVIDOR
-====================== */
-
+/* =====================
+   SERVER
+===================== */
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, () => {

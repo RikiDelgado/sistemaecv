@@ -12,6 +12,7 @@ const router = express.Router();
  */
 router.post("/", async (req, res) => {
   try {
+    console.log("BODY RECIBIDO:", req.body);
     const {
       nombre,
       apellido,
@@ -27,6 +28,7 @@ router.post("/", async (req, res) => {
       alergia_alimento,
       alergia_alimento_detalle,
     } = req.body;
+
 
     // Validaciones mínimas
     if (!nombre || !apellido || !dni || !fecha_nacimiento) {
