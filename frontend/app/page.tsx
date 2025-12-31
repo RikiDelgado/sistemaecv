@@ -2,6 +2,7 @@
 import Image from "next/image";
 import Link from "next/link";
 
+export const dynamic = 'force-dynamic';
 export default function Home() {
   return (
     <main className="bg-gradient-to-b from-sky-300 via-yellow-100 to-amber-200 min-h-screen text-gray-800">
