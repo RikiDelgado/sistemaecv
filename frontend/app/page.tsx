@@ -144,7 +144,7 @@ export default function Home() {
       {/* PRECIO Y CTA */}
       <section className="bg-amber-700 text-white py-20 text-center">
         <h2 className="text-4xl font-extrabold mb-4">
-          Inscripción Abierta
+          Inscripciones Abiertas
         </h2>
         <p className="text-xl mb-6">
           💲 Valor de inscripción: <strong>$15.000</strong>
@@ -163,7 +163,7 @@ export default function Home() {
         <p className="mb-2 font-semibold">
           📍 Iglesia Adventista del Séptimo Día – Villa Celina
         </p>
-        <p>📞 Contacto: 11-XXXX-XXXX</p>
+        <p>📞 Contacto: 11-6350-4992</p>
         <p>📧 Email: ecv@mision.com</p>
       </footer>
     </main>
