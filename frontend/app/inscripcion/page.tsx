@@ -1,4 +1,4 @@
-//frontend/app/inscripcion/page.tsx
+// frontend/app/inscripcion/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -20,6 +20,8 @@ export default function InscripcionECV() {
     alergia_alimento_detalle: "",
   });
 
+  const [loading, setLoading] = useState(false);
+
   const handleChange = (e: any) => {
     const { name, value, type, checked } = e.target;
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
@@ -27,32 +29,61 @@ export default function InscripcionECV() {
 
   const handleSubmit = async (e: any) => {
     e.preventDefault();
+    if (loading) return;
 
-    const res = await fetch(process.env.NEXT_PUBLIC_API_URL + "/alumnos", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form),
-    });
+    setLoading(true);
 
-    const data = await res.json();
+    try {
+      const res = await fetch(
+        process.env.NEXT_PUBLIC_API_URL + "/alumnos",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(form),
+        }
+      );
 
-    if (!res.ok) {
-      alert(data.error);
-      return;
+      const data = await res.json();
+
+      if (!res.ok) {
+        alert(data.error || "Error al inscribir alumno");
+        setLoading(false);
+        return;
+      }
+
+      alert(
+        "💚 ¡Inscripción realizada con éxito!\n\n" +
+          "Gracias por inscribir a tu hijo/a en la Escuela Cristiana de Vacaciones 2026.\n\n" +
+          "Nos estaremos comunicando pronto con más información.\n" +
+          "¡Que Dios los bendiga! 🙏"
+      );
+
+      // Limpiar formulario
+      setForm({
+        nombre: "",
+        apellido: "",
+        dni: "",
+        fecha_nacimiento: "",
+        genero: "",
+        direccion: "",
+        tutor_nombre: "",
+        tutor_apellido: "",
+        tutor_telefono: "",
+        alergia_medicamento: false,
+        alergia_medicamento_detalle: "",
+        alergia_alimento: false,
+        alergia_alimento_detalle: "",
+      });
+    } catch (error) {
+      alert("Error de conexión con el servidor");
+    } finally {
+      setLoading(false);
     }
-
-    alert(
-  "💚 ¡Inscripción realizada con éxito!\n\n" +
-  "Gracias por inscribir a tu hijo/a en la Escuela Cristiana de Vacaciones 2026.\n\n" +
-  "Nos estaremos comunicando pronto con más información.\n" +
-  "¡Que Dios los bendiga! 🙏");
   };
 
   return (
     <main className="min-h-screen flex items-center justify-center p-4 bg-sand">
       <div className="max-w-3xl w-full bg-white rounded-2xl shadow-xl p-6">
-        
-        {/* HEADER */}
         <header className="text-center mb-6">
           <h1 className="text-3xl font-bold text-oasis">
             Escuela Cristiana de Vacaciones 2026
@@ -62,7 +93,6 @@ export default function InscripcionECV() {
           </p>
         </header>
 
-        {/* IMAGEN DEL EVENTO */}
         <div className="mb-8">
           <img
             src="/aventuras-desierto.jpg"
@@ -71,37 +101,32 @@ export default function InscripcionECV() {
           />
         </div>
 
-        {/* FORMULARIO */}
         <form onSubmit={handleSubmit} className="space-y-6">
-          
-          {/* DATOS DEL ALUMNO */}
           <section>
             <h2 className="font-semibold text-oasis mb-2">
               Datos del niño/a
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input className="input" name="nombre" placeholder="Nombre" onChange={handleChange} />
-              <input className="input" name="apellido" placeholder="Apellido" onChange={handleChange} />
-              <input className="input" name="dni" placeholder="DNI" onChange={handleChange} />
-              <input className="input" type="date" name="fecha_nacimiento" onChange={handleChange} />
-              <input className="input" name="genero" placeholder="Género" onChange={handleChange} />
-              <input className="input" name="direccion" placeholder="Dirección (opcional)" onChange={handleChange} />
+              <input className="input" name="nombre" placeholder="Nombre" value={form.nombre} onChange={handleChange} />
+              <input className="input" name="apellido" placeholder="Apellido" value={form.apellido} onChange={handleChange} />
+              <input className="input" name="dni" placeholder="DNI" value={form.dni} onChange={handleChange} />
+              <input className="input" type="date" name="fecha_nacimiento" value={form.fecha_nacimiento} onChange={handleChange} />
+              <input className="input" name="genero" placeholder="Género" value={form.genero} onChange={handleChange} />
+              <input className="input" name="direccion" placeholder="Dirección (opcional)" value={form.direccion} onChange={handleChange} />
             </div>
           </section>
 
-          {/* TUTOR */}
           <section>
             <h2 className="font-semibold text-oasis mb-2">
               Información del tutor
             </h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <input className="input" name="tutor_nombre" placeholder="Nombre" onChange={handleChange} />
-              <input className="input" name="tutor_apellido" placeholder="Apellido" onChange={handleChange} />
-              <input className="input md:col-span-2" name="tutor_telefono" placeholder="Teléfono" onChange={handleChange} />
+              <input className="input" name="tutor_nombre" placeholder="Nombre" value={form.tutor_nombre} onChange={handleChange} />
+              <input className="input" name="tutor_apellido" placeholder="Apellido" value={form.tutor_apellido} onChange={handleChange} />
+              <input className="input md:col-span-2" name="tutor_telefono" placeholder="Teléfono" value={form.tutor_telefono} onChange={handleChange} />
             </div>
           </section>
 
-          {/* SALUD */}
           <section>
             <h2 className="font-semibold text-oasis mb-2">
               Información de salud <span className="text-sm text-gray-500">(solo marcar si corresponde)</span>
@@ -109,27 +134,31 @@ export default function InscripcionECV() {
 
             <div className="space-y-2">
               <label className="flex gap-2 items-center">
-                <input type="checkbox" name="alergia_medicamento" onChange={handleChange} />
+                <input type="checkbox" name="alergia_medicamento" checked={form.alergia_medicamento} onChange={handleChange} />
                 ¿Alergia a medicamentos?
               </label>
+
               {form.alergia_medicamento && (
                 <input
                   className="input"
                   name="alergia_medicamento_detalle"
                   placeholder="¿Cuál?"
+                  value={form.alergia_medicamento_detalle}
                   onChange={handleChange}
                 />
               )}
 
               <label className="flex gap-2 items-center">
-                <input type="checkbox" name="alergia_alimento" onChange={handleChange} />
+                <input type="checkbox" name="alergia_alimento" checked={form.alergia_alimento} onChange={handleChange} />
                 ¿Alergia a alimentos?
               </label>
+
               {form.alergia_alimento && (
                 <input
                   className="input"
                   name="alergia_alimento_detalle"
                   placeholder="¿Cuál?"
+                  value={form.alergia_alimento_detalle}
                   onChange={handleChange}
                 />
               )}
@@ -138,9 +167,14 @@ export default function InscripcionECV() {
 
           <button
             type="submit"
-            className="w-full bg-oasis text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition"
+            disabled={loading}
+            className={`w-full py-3 rounded-xl font-semibold transition ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-oasis text-white hover:bg-green-700"
+            }`}
           >
-            Inscribir
+            {loading ? "Inscribiendo..." : "Inscribir"}
           </button>
         </form>
       </div>
