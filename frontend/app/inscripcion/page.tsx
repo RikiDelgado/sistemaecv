@@ -20,7 +20,7 @@ export default function InscripcionECV() {
     alergia_alimento_detalle: "",
   });
 
-  // NUEVO: fecha separada
+  // Fecha separada
   const [fecha, setFecha] = useState({
     dia: "",
     mes: "",
@@ -34,7 +34,6 @@ export default function InscripcionECV() {
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
-  // NUEVO: manejar día / mes / año
   const handleFechaChange = (e: any) => {
     const { name, value } = e.target;
     setFecha({ ...fecha, [name]: value });
@@ -44,7 +43,6 @@ export default function InscripcionECV() {
     e.preventDefault();
     if (loading) return;
 
-    // Construir fecha YYYY-MM-DD
     const fechaNacimiento =
       fecha.anio && fecha.mes && fecha.dia
         ? `${fecha.anio}-${fecha.mes.padStart(2, "0")}-${fecha.dia.padStart(2, "0")}`
@@ -69,7 +67,6 @@ export default function InscripcionECV() {
 
       if (!res.ok) {
         alert(data.error || "Error al inscribir alumno");
-        setLoading(false);
         return;
       }
 
@@ -80,7 +77,6 @@ export default function InscripcionECV() {
           "¡Que Dios los bendiga! 🙏"
       );
 
-      // Limpiar formulario
       setForm({
         nombre: "",
         apellido: "",
@@ -98,7 +94,7 @@ export default function InscripcionECV() {
       });
 
       setFecha({ dia: "", mes: "", anio: "" });
-    } catch (error) {
+    } catch {
       alert("Error de conexión con el servidor");
     } finally {
       setLoading(false);
@@ -136,11 +132,16 @@ export default function InscripcionECV() {
               <input className="input" name="apellido" placeholder="Apellido" value={form.apellido} onChange={handleChange} />
               <input className="input" name="dni" placeholder="DNI" value={form.dni} onChange={handleChange} />
 
-              {/* FECHA SIN CALENDARIO */}
-              <div className="flex gap-2 md:col-span-2">
-                <input className="input w-1/3" name="dia" placeholder="Día" value={fecha.dia} onChange={handleFechaChange} />
-                <input className="input w-1/3" name="mes" placeholder="Mes" value={fecha.mes} onChange={handleFechaChange} />
-                <input className="input w-1/3" name="anio" placeholder="Año" value={fecha.anio} onChange={handleFechaChange} />
+              {/* FECHA DE NACIMIENTO */}
+              <div className="md:col-span-2">
+                <label className="text-sm text-gray-600 mb-1 block">
+                  Fecha de nacimiento
+                </label>
+                <div className="flex gap-2">
+                  <input className="input w-1/3" name="dia" placeholder="Día" value={fecha.dia} onChange={handleFechaChange} />
+                  <input className="input w-1/3" name="mes" placeholder="Mes" value={fecha.mes} onChange={handleFechaChange} />
+                  <input className="input w-1/3" name="anio" placeholder="Año" value={fecha.anio} onChange={handleFechaChange} />
+                </div>
               </div>
 
               <input className="input" name="genero" placeholder="Género" value={form.genero} onChange={handleChange} />
