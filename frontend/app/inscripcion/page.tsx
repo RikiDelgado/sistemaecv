@@ -20,6 +20,13 @@ export default function InscripcionECV() {
     alergia_alimento_detalle: "",
   });
 
+  // NUEVO: fecha separada
+  const [fecha, setFecha] = useState({
+    dia: "",
+    mes: "",
+    anio: "",
+  });
+
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: any) => {
@@ -27,9 +34,21 @@ export default function InscripcionECV() {
     setForm({ ...form, [name]: type === "checkbox" ? checked : value });
   };
 
+  // NUEVO: manejar día / mes / año
+  const handleFechaChange = (e: any) => {
+    const { name, value } = e.target;
+    setFecha({ ...fecha, [name]: value });
+  };
+
   const handleSubmit = async (e: any) => {
     e.preventDefault();
     if (loading) return;
+
+    // Construir fecha YYYY-MM-DD
+    const fechaNacimiento =
+      fecha.anio && fecha.mes && fecha.dia
+        ? `${fecha.anio}-${fecha.mes.padStart(2, "0")}-${fecha.dia.padStart(2, "0")}`
+        : "";
 
     setLoading(true);
 
@@ -39,7 +58,10 @@ export default function InscripcionECV() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(form),
+          body: JSON.stringify({
+            ...form,
+            fecha_nacimiento: fechaNacimiento,
+          }),
         }
       );
 
@@ -74,6 +96,8 @@ export default function InscripcionECV() {
         alergia_alimento: false,
         alergia_alimento_detalle: "",
       });
+
+      setFecha({ dia: "", mes: "", anio: "" });
     } catch (error) {
       alert("Error de conexión con el servidor");
     } finally {
@@ -106,11 +130,19 @@ export default function InscripcionECV() {
             <h2 className="font-semibold text-oasis mb-2">
               Datos del niño/a
             </h2>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input className="input" name="nombre" placeholder="Nombre" value={form.nombre} onChange={handleChange} />
               <input className="input" name="apellido" placeholder="Apellido" value={form.apellido} onChange={handleChange} />
               <input className="input" name="dni" placeholder="DNI" value={form.dni} onChange={handleChange} />
-              <input className="input" type="date" name="fecha_nacimiento" value={form.fecha_nacimiento} onChange={handleChange} />
+
+              {/* FECHA SIN CALENDARIO */}
+              <div className="flex gap-2 md:col-span-2">
+                <input className="input w-1/3" name="dia" placeholder="Día" value={fecha.dia} onChange={handleFechaChange} />
+                <input className="input w-1/3" name="mes" placeholder="Mes" value={fecha.mes} onChange={handleFechaChange} />
+                <input className="input w-1/3" name="anio" placeholder="Año" value={fecha.anio} onChange={handleFechaChange} />
+              </div>
+
               <input className="input" name="genero" placeholder="Género" value={form.genero} onChange={handleChange} />
               <input className="input" name="direccion" placeholder="Dirección (opcional)" value={form.direccion} onChange={handleChange} />
             </div>
@@ -120,6 +152,7 @@ export default function InscripcionECV() {
             <h2 className="font-semibold text-oasis mb-2">
               Información del tutor
             </h2>
+
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <input className="input" name="tutor_nombre" placeholder="Nombre" value={form.tutor_nombre} onChange={handleChange} />
               <input className="input" name="tutor_apellido" placeholder="Apellido" value={form.tutor_apellido} onChange={handleChange} />
