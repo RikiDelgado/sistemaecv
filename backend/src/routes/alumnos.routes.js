@@ -13,6 +13,7 @@ const router = express.Router();
 router.post("/", async (req, res) => {
   try {
     console.log("BODY RECIBIDO:", req.body);
+
     const {
       nombre,
       apellido,
@@ -27,8 +28,8 @@ router.post("/", async (req, res) => {
       alergia_medicamento_detalle,
       alergia_alimento,
       alergia_alimento_detalle,
+      talle_remera, // 🆕 NUEVO
     } = req.body;
-
 
     // Validaciones mínimas
     if (!nombre || !apellido || !dni || !fecha_nacimiento) {
@@ -52,10 +53,11 @@ router.post("/", async (req, res) => {
         alergia_medicamento,
         alergia_medicamento_detalle,
         alergia_alimento,
-        alergia_alimento_detalle
+        alergia_alimento_detalle,
+        talle_remera
       )
       VALUES (
-        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13
+        $1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14
       )
       RETURNING *
       `,
@@ -73,6 +75,7 @@ router.post("/", async (req, res) => {
         alergia_medicamento_detalle,
         alergia_alimento,
         alergia_alimento_detalle,
+        talle_remera || null, // 🆕 opcional
       ]
     );
 
@@ -97,7 +100,7 @@ router.post("/", async (req, res) => {
 
 /**
  * GET /alumnos
- * Lista de alumnos (admin y docente)
+ * Lista de alumnos
  */
 router.get(
   "/",
@@ -119,7 +122,6 @@ router.get(
 
 /**
  * GET /alumnos/:id
- * Alumno individual
  */
 router.get(
   "/:id",

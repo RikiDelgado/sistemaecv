@@ -1,4 +1,4 @@
-// frontend/app/inscripcion/page.tsx
+//frontend/app/inscripcion/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -11,6 +11,7 @@ export default function InscripcionECV() {
     fecha_nacimiento: "",
     genero: "",
     direccion: "",
+    talle_remera: "", // 🆕 NUEVO
     tutor_nombre: "",
     tutor_apellido: "",
     tutor_telefono: "",
@@ -20,7 +21,6 @@ export default function InscripcionECV() {
     alergia_alimento_detalle: "",
   });
 
-  // Fecha separada
   const [fecha, setFecha] = useState({
     dia: "",
     mes: "",
@@ -84,6 +84,7 @@ export default function InscripcionECV() {
         fecha_nacimiento: "",
         genero: "",
         direccion: "",
+        talle_remera: "",
         tutor_nombre: "",
         tutor_apellido: "",
         tutor_telefono: "",
@@ -144,8 +145,34 @@ export default function InscripcionECV() {
                 </div>
               </div>
 
-              <input className="input" name="genero" placeholder="Género" value={form.genero} onChange={handleChange} />
-              <input className="input" name="direccion" placeholder="Dirección (opcional)" value={form.direccion} onChange={handleChange} />
+              {/* SEXO */}
+              <select
+                className="input"
+                name="genero"
+                value={form.genero}
+                onChange={handleChange}
+              >
+                <option value="">Seleccionar sexo</option>
+                <option value="M">Masculino</option>
+                <option value="F">Femenino</option>
+              </select>
+
+              <input
+                className="input"
+                name="direccion"
+                placeholder="Dirección (opcional)"
+                value={form.direccion}
+                onChange={handleChange}
+              />
+
+              {/* 🆕 TALLE DE REMERA */}
+              <input
+                className="input md:col-span-2"
+                name="talle_remera"
+                placeholder="Talle de remera (ej: 6, 8, S, M, L)"
+                value={form.talle_remera}
+                onChange={handleChange}
+              />
             </div>
           </section>
 
