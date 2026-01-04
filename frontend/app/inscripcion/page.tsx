@@ -137,7 +137,7 @@ export default function InscripcionECV() {
               {/* FECHA DE NACIMIENTO */}
               <div className="md:col-span-2">
                 <label className="text-sm text-gray-600 mb-1 block">
-                  Fecha de nacimiento
+                  Fecha de nacimiento (INGRESAR NÚMEROS)
                 </label>
                 <div className="flex gap-2">
                   <input className="input w-1/3" name="dia" placeholder="Día" value={fecha.dia} onChange={handleFechaChange} />

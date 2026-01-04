@@ -28,8 +28,11 @@ router.post("/", async (req, res) => {
       alergia_medicamento_detalle,
       alergia_alimento,
       alergia_alimento_detalle,
-      talle_remera, // 🆕 NUEVO
+      talle_remera,
+      talla_remera,
     } = req.body;
+    
+    const talleFinal = talle_remera ?? talla_remera ?? null;
 
     // Validaciones mínimas
     if (!nombre || !apellido || !dni || !fecha_nacimiento) {
@@ -75,7 +78,7 @@ router.post("/", async (req, res) => {
         alergia_medicamento_detalle,
         alergia_alimento,
         alergia_alimento_detalle,
-        talle_remera || null, // 🆕 opcional
+        talleFinal, // ✅ ACÁ QUEDA CORRECTO
       ]
     );
 
