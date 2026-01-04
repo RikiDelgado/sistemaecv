@@ -148,7 +148,7 @@ export default function Home() {
           Inscripciones Abiertas
         </h2>
         <p className="text-xl mb-6">
-          💲 Valor de inscripción: <strong>$15.000</strong>
+          💲 Valor de inscripción: <strong>$10.000</strong>
         </p>
 
         <Link
@@ -162,10 +162,10 @@ export default function Home() {
       {/* CONTACTO */}
       <footer className="bg-amber-900 text-amber-100 py-10 text-center">
         <p className="mb-2 font-semibold">
-          📍 Iglesia Adventista del Séptimo Día – Villa Celina
+          📍 IASD Villa Celina - Rivera 2215  
         </p>
         <p>📞 Contacto: 11-6350-4992</p>
-        <p>📧 Email: ecv@mision.com</p>
+        <p>📲 Instagram: iglesia.celina</p>
       </footer>
     </main>
   );
