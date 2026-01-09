@@ -72,10 +72,7 @@ export default function InscripcionECV() {
       }
 
       alert(
-        "💚 ¡Inscripción realizada con éxito!\n\n" +
-          "Gracias por inscribir a tu hijo/a en la Escuela Cristiana de Vacaciones 2026.\n\n" +
-          "Nos estaremos comunicando pronto con más información.\n" +
-          "¡Que Dios los bendiga! 🙏"
+        "No se pudo inscribir, porfavor intentalo mas tarde"
       );
 
       setForm({
