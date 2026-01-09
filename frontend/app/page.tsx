@@ -9,7 +9,7 @@ export default function Home() {
       {/* HERO */}
       <section className="max-w-6xl mx-auto px-6 py-20 text-center">
         <h1 className="text-4xl md:text-5xl font-extrabold mb-6 text-amber-900">
-          Escuela Cristiana de Vacaciones
+          Colonia Cristiana de Vacaciones 2026
         </h1>
 
         <p className="text-lg md:text-xl max-w-3xl mx-auto mb-8">
@@ -32,7 +32,7 @@ export default function Home() {
         <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8 text-center">
           <div className="p-6 rounded-xl shadow">
             <h3 className="font-bold text-xl mb-2">📅 Duración</h3>
-            <p>6 días – 1 semana completa</p>
+            <p>7 días – del 18 al 24 de enero</p>
           </div>
           <div className="p-6 rounded-xl shadow">
             <h3 className="font-bold text-xl mb-2">👦👧 Edades</h3>
@@ -59,16 +59,32 @@ export default function Home() {
             <h2 className="text-3xl font-bold mb-4 text-amber-900">
               Apertura: Aventuras en el Desierto
             </h2>
-            <p className="mb-4">
-              Acompañados por <strong>el Guía</strong> (representando a Jesús),
-              y los hermanos <strong>Theo y Nina</strong>, los niños vivirán un
-              viaje por el desierto aprendiendo verdades bíblicas profundas.
-            </p>
-            <p>
-              El escenario conecta el <strong>auto rojo</strong> (sacrificio) con
-              la <strong>tienda del Santuario</strong>, mostrando que todo señala
-              a Jesús y su plan de salvación.
-            </p>
+              <p className="mb-4">
+                Acompañados por <strong>el Guía</strong> (representando a Jesús),
+                y los hermanos <strong>Theo y Nina</strong>, los niños vivirán un
+                emocionante viaje por el desierto mientras descubren verdades bíblicas profundas.
+              </p>
+              <p>
+                El escenario conecta el <strong>auto rojo</strong> (símbolo de sacrificio)
+                con la <strong>tienda del Santuario</strong>, mostrando que todo apunta
+                a Jesús y a su plan de salvación.
+              </p>
+              <p>
+                Cada elemento visual ayuda a los niños a comprender cómo Dios guiaba
+                a su pueblo y cómo esas historias siguen teniendo significado hoy.
+              </p>
+              <p>
+                A través de dinámicas y relatos, los participantes aprenderán que
+                Dios siempre cumple sus promesas y camina con nosotros.
+              </p>
+              <p>
+                El desierto se convierte en un lugar de aprendizaje, confianza
+                y dependencia total en Dios.
+              </p>
+              <p>
+                Todo el recorrido refuerza que Jesús es el centro de la historia
+                y la esperanza para todos.
+              </p>
           </div>
         </div>
       </section>
@@ -155,7 +171,7 @@ export default function Home() {
           href="/inscripcion"
           className="inline-block bg-white text-amber-800 font-bold px-10 py-4 rounded-full shadow-lg hover:bg-amber-100 transition"
         >
-          Inscribí a tu hijo ahora
+          Inscribí a tu hijo/a ahora
         </Link>
       </section>
 

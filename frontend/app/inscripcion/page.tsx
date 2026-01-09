@@ -4,6 +4,7 @@
 import { useState } from "react";
 
 export const dynamic = "force-dynamic";
+
 export default function InscripcionECV() {
   const [form, setForm] = useState({
     nombre: "",
@@ -12,7 +13,7 @@ export default function InscripcionECV() {
     fecha_nacimiento: "",
     genero: "",
     direccion: "",
-    talle_remera: "", // 🆕 NUEVO
+    talle_remera: "",
     tutor_nombre: "",
     tutor_apellido: "",
     tutor_telefono: "",
@@ -44,6 +45,12 @@ export default function InscripcionECV() {
     e.preventDefault();
     if (loading) return;
 
+    // 🛑 Validación mínima frontend
+    if (!form.nombre || !form.apellido || !form.dni) {
+      alert("⚠️ Completá los datos obligatorios ‼️");
+      return;
+    }
+
     const fechaNacimiento =
       fecha.anio && fecha.mes && fecha.dia
         ? `${fecha.anio}-${fecha.mes.padStart(2, "0")}-${fecha.dia.padStart(2, "0")}`
@@ -64,12 +71,14 @@ export default function InscripcionECV() {
         }
       );
 
-      const data = await res.json();
-
+      // Backend resp. error
       if (!res.ok) {
-        alert(data.error || "Error al inscribir alumno");
-        return;
+        const error = await res.json();
+        throw new Error(error.error || "Error al inscribir");
       }
+
+      // Backend resp. OK
+      await res.json();
 
       alert(
         "💚 ¡Inscripción realizada con éxito!\n\n" +
@@ -96,8 +105,12 @@ export default function InscripcionECV() {
       });
 
       setFecha({ dia: "", mes: "", anio: "" });
-    } catch {
-      alert("Error de conexión con el servidor");
+    } catch (error) {
+      console.error("ERROR FETCH:", error);
+      alert(
+        "⚠️ Hubo un problema al enviar la inscripción.\n\n" +
+          "Si no recibió confirmación, por favor contáctenos por WhatsApp."
+      );
     } finally {
       setLoading(false);
     }
@@ -126,7 +139,7 @@ export default function InscripcionECV() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <section>
             <h2 className="font-semibold text-oasis mb-2">
-              Datos del niño/a
+              Datos del niño/a ‼️
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -137,7 +150,7 @@ export default function InscripcionECV() {
               {/* FECHA DE NACIMIENTO */}
               <div className="md:col-span-2">
                 <label className="text-sm text-gray-600 mb-1 block">
-                  Fecha de nacimiento (INGRESAR NÚMEROS)
+                  Fecha de nacimiento <strong>(ingresar solo números)</strong>
                 </label>
                 <div className="flex gap-2">
                   <input className="input w-1/3" name="dia" placeholder="Día" value={fecha.dia} onChange={handleFechaChange} />
