@@ -109,7 +109,7 @@ export default function InscripcionECV() {
       console.error("ERROR FETCH:", error);
       alert(
         "⚠️ Hubo un problema al enviar la inscripción.\n\n" +
-          "Si no recibió confirmación, por favor contáctenos por WhatsApp."
+          "Si no recibió confirmación, por favor contáctenos por WhatsApp al 1163504992"
       );
     } finally {
       setLoading(false);

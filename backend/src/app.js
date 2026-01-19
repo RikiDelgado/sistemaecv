@@ -7,6 +7,7 @@ import pool from "./db.js";
 import alumnosRoutes from "./routes/alumnos.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import asistenciasRoutes from "./routes/asistencias.routes.js";
+import asistenciasAdminRoutes from "./routes/asistenciasAdmin.routes.js";
 
 dotenv.config();
 
@@ -18,6 +19,9 @@ const app = express();
 
 // ⚠️ ESTE ES EL MÁS IMPORTANTE
 app.use(express.json());
+
+//AdminAsistencias
+app.use("/admin/asistencias", asistenciasAdminRoutes);
 
 // CORS abierto (correcto para Render + Vercel)
 app.use(

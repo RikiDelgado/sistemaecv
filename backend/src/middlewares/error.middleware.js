@@ -1,4 +1,4 @@
-//backend/middlewares/error.middleware.js
+//backend/src/middlewares/error.middleware.js
 export const errorMiddleware = (err, req, res, next) => {
   console.error(err);
 
