@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState, use } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "../../../lib/api";
 import { useAuth } from "../../../lib/useAuth";
@@ -11,7 +12,7 @@ type Props = {
 };
 
 export default function TomarAsistencia({ params }: Props) {
-  const { id } = use(params); // ✅ forma correcta
+  const { id } = use(params);
   const usuario = useAuth();
   const router = useRouter();
   const [lista, setLista] = useState<any[]>([]);
@@ -46,11 +47,17 @@ export default function TomarAsistencia({ params }: Props) {
 
   return (
     <main className="p-6 space-y-4">
+      {/* 🔙 Navegación correcta */}
+      <Link
+        href="/dashboard/asistencias"
+        className="inline-block text-blue-600 underline"
+      >
+        ⬅ Volver a asistencias
+      </Link>
+
       <h1 className="text-xl font-bold">Tomar asistencia</h1>
 
-      {error && (
-        <p className="text-red-600">{error}</p>
-      )}
+      {error && <p className="text-red-600">{error}</p>}
 
       {lista.map((a) => (
         <div

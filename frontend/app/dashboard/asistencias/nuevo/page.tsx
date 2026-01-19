@@ -2,6 +2,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { apiFetch } from "../../../lib/api";
 import { useAuth } from "../../../lib/useAuth";
@@ -28,6 +29,14 @@ export default function NuevoDiaPage() {
 
   return (
     <main className="p-6 max-w-md space-y-4">
+      {/* 🔙 Navegación correcta */}
+      <Link
+        href="/dashboard/asistencias"
+        className="inline-block text-blue-600 underline"
+      >
+        ⬅ Volver a asistencias
+      </Link>
+
       <h1 className="text-xl font-bold">
         Nuevo día de asistencia
       </h1>

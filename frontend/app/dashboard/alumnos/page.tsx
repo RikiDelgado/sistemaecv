@@ -4,8 +4,12 @@
 import { useEffect, useState } from "react";
 import { apiFetch } from "../../lib/api";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
+import { logout } from "../../lib/logout";
+import { useAuth } from "../../lib/useAuth";
 
 export default function AlumnosPage() {
+  const usuario = useAuth();
   const router = useRouter();
   const [alumnos, setAlumnos] = useState<any[]>([]);
   const [error, setError] = useState("");
@@ -26,15 +30,29 @@ export default function AlumnosPage() {
     cargarAlumnos();
   }, [router]);
 
-  return (
-    <main className="min-h-screen p-6">
-      <h1 className="text-2xl font-bold mb-4">
-        Alumnos inscriptos
-      </h1>
+  if (!usuario) return null;
 
-      {error && (
-        <p className="text-red-600">{error}</p>
-      )}
+  return (
+    <main className="min-h-screen p-6 space-y-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Alumnos inscriptos</h1>
+
+        <button
+          onClick={() => logout(router)}
+          className="bg-red-600 text-white px-4 py-2 rounded"
+        >
+          Cerrar sesión
+        </button>
+      </div>
+
+      <Link
+        href="/dashboard"
+        className="inline-block text-blue-600 underline"
+      >
+        ⬅ Volver al panel principal
+      </Link>
+
+      {error && <p className="text-red-600">{error}</p>}
 
       <table className="w-full border">
         <thead>

@@ -2,18 +2,28 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "../lib/useAuth";
+import { logout } from "../lib/logout";
 
 export default function DashboardPage() {
   const usuario = useAuth();
+  const router = useRouter();
 
   if (!usuario) return null;
 
   return (
     <main className="min-h-screen p-6 space-y-6">
-      <h1 className="text-3xl font-bold">
-        Panel de Control
-      </h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-3xl font-bold">Panel de Control</h1>
+
+        <button
+          onClick={() => logout(router)}
+          className="bg-red-600 text-white px-4 py-2 rounded"
+        >
+          Cerrar sesión
+        </button>
+      </div>
 
       <p>
         Bienvenido <strong>{usuario.nombre}</strong> ({usuario.rol})
