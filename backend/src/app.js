@@ -6,7 +6,6 @@ import cors from "cors";
 import pool from "./db.js";
 import alumnosRoutes from "./routes/alumnos.routes.js";
 import authRoutes from "./routes/auth.routes.js";
-import asistenciasRoutes from "./routes/asistencias.routes.js";
 import asistenciasAdminRoutes from "./routes/asistenciasAdmin.routes.js";
 
 dotenv.config();
@@ -17,11 +16,8 @@ const app = express();
    MIDDLEWARES CLAVE
 ===================== */
 
-// ⚠️ ESTE ES EL MÁS IMPORTANTE
+// JSON (obligatorio)
 app.use(express.json());
-
-//AdminAsistencias
-app.use("/admin/asistencias", asistenciasAdminRoutes);
 
 // CORS abierto (correcto para Render + Vercel)
 app.use(
@@ -34,9 +30,14 @@ app.use(
    RUTAS
 ===================== */
 
-app.use("/alumnos", alumnosRoutes);
+// Auth
 app.use("/auth", authRoutes);
-app.use("/asistencias", asistenciasRoutes);
+
+// Alumnos
+app.use("/alumnos", alumnosRoutes);
+
+// Asistencias ADMIN / DOCENTE
+app.use("/admin/asistencias", asistenciasAdminRoutes);
 
 /* =====================
    RUTA TEST
