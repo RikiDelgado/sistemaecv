@@ -81,9 +81,8 @@ export default function InscripcionECV() {
       await res.json();
 
       alert(
-        "💚 ¡Inscripción realizada con éxito!\n\n" +
-          "Gracias por inscribir a tu hijo/a en la Escuela Cristiana de Vacaciones 2026.\n\n" +
-          "Nos estaremos comunicando pronto para las indicaciones por el pago de inscripción.\n" +
+        "❤️ ¡Lo sentimos... Inscripción NO realizada con éxito!\n\n" +
+          "Las inscripciones se cerraron el día 18 de diciembre a las 00:00\n" +
           "¡Que Dios los bendiga! 🙏"
       );
 
@@ -124,7 +123,7 @@ export default function InscripcionECV() {
             Escuela Cristiana de Vacaciones 2026
           </h1>
           <p className="text-lg text-sunset mt-2">
-            🌵 Completá este formulario para inscribir a tu hijo/a 🌵
+            🌵 Completá este formulario para inscribir a tu hijo/a ‼️(INSCRIPCIONES CERRADAS)‼️ 🌵
           </p>
         </header>
 
@@ -139,7 +138,7 @@ export default function InscripcionECV() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <section>
             <h2 className="font-semibold text-oasis mb-2">
-              Datos del niño/a ‼️
+              Datos del niño/a: ‼️(INSCRIPCIONES CERRADAS)‼️
             </h2>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
