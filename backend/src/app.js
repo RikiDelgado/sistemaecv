@@ -7,6 +7,8 @@ import pool from "./db.js";
 import alumnosRoutes from "./routes/alumnos.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import asistenciasAdminRoutes from "./routes/asistenciasAdmin.routes.js";
+import tribusRoutes from "./routes/tribus.routes.js";
+
 
 dotenv.config();
 
@@ -15,6 +17,7 @@ const app = express();
 /* =====================
    MIDDLEWARES CLAVE
 ===================== */
+app.use("/tribus", tribusRoutes);
 
 // JSON (obligatorio)
 app.use(express.json());

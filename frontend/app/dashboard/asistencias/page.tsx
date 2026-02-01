@@ -77,7 +77,7 @@ export default function AsistenciasPage() {
                 href={`/dashboard/asistencias/${dia.id}`}
                 className="text-blue-600 underline"
               >
-                Ver
+                Tomar asistencia 
               </Link>
 
               <button
