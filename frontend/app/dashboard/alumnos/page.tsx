@@ -128,6 +128,7 @@ export default function AlumnosPage() {
 
       {error && <p className="text-red-600">{error}</p>}
 
+
       {/* Cards */}
       <div className="space-y-4">
         {alumnosFiltrados.map((alumno) => {
@@ -189,6 +190,27 @@ export default function AlumnosPage() {
           );
         })}
       </div>
+=======
+      <table className="w-full border">
+        <thead>
+          <tr className="bg-gray-100">
+            <th className="border p-2">Nombre</th>
+            <th className="border p-2">Apellido</th>
+            <th className="border p-2">Nombre del tutor</th>
+            <th className="border p-2">Teléfono del tutor</th>
+          </tr>
+        </thead>
+        <tbody>
+          {alumnos.map((alumno) => (
+            <tr key={alumno.id}>
+              <td className="border p-2">{alumno.nombre}</td>
+              <td className="border p-2">{alumno.apellido}</td>
+              <td className="border p-2">{alumno.tutor_nombre}</td>
+              <td className="border p-2">{alumno.tutor_telefono}</td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
     </main>
   );
 }
