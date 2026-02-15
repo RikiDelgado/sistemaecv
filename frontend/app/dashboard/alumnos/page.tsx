@@ -1,4 +1,4 @@
-//frontend/app/dashboard/alumnos/page.tsx
+// frontend/app/dashboard/alumnos/page.tsx
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
@@ -6,6 +6,9 @@ import { apiFetch } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../../lib/useAuth";
+
+import AlumnoModal from "./components/AlumnoModal";
+import ConfirmDelete from "./components/ConfirmDelete";
 
 /* Helpers */
 function calcularEdad(fecha: string) {
@@ -30,31 +33,37 @@ function formatearFechaISO(fecha: string) {
 export default function AlumnosPage() {
   const usuario = useAuth();
   const router = useRouter();
+
   const [alumnos, setAlumnos] = useState<any[]>([]);
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    async function cargarAlumnos() {
-      try {
-        const data = await apiFetch("/alumnos");
+  // 👉 Estados nuevos
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [editarAlumno, setEditarAlumno] = useState<any>(null);
+  const [eliminarAlumno, setEliminarAlumno] = useState<any>(null);
 
-        // Ordenar por nombre
-        const ordenados = data.sort((a: any, b: any) =>
-          a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
-        );
+  // 👉 Función reutilizable (antes estaba dentro del useEffect)
+  async function cargarAlumnos() {
+    try {
+      const data = await apiFetch("/alumnos");
 
-        setAlumnos(ordenados);
-      } catch (err: any) {
-        setError(err.message);
-        if (err.message.includes("Token")) {
-          router.push("/login");
-        }
+      const ordenados = data.sort((a: any, b: any) =>
+        a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
+      );
+
+      setAlumnos(ordenados);
+    } catch (err: any) {
+      setError(err.message);
+      if (err.message.includes("Token")) {
+        router.push("/login");
       }
     }
+  }
 
+  useEffect(() => {
     cargarAlumnos();
-  }, [router]);
+  }, []);
 
   const alumnosFiltrados = useMemo(() => {
     return alumnos.filter((a) =>
@@ -79,12 +88,16 @@ export default function AlumnosPage() {
           </p>
         </div>
 
-        <Link
-          href="/dashboard/alumnos/nuevo"
+        {/* 👉 Botón Agregar */}
+        <button
+          onClick={() => {
+            setEditarAlumno(null);
+            setModalAbierto(true);
+          }}
           className="bg-[#c98b1f] text-white px-4 py-2 rounded-xl shadow hover:bg-[#b57b1b]"
         >
           ➕ Agregar Estudiante
-        </Link>
+        </button>
       </div>
 
       {/* Volver */}
@@ -127,7 +140,6 @@ export default function AlumnosPage() {
       />
 
       {error && <p className="text-red-600">{error}</p>}
-
 
       {/* Cards */}
       <div className="space-y-4">
@@ -179,10 +191,20 @@ export default function AlumnosPage() {
 
               {/* Acciones */}
               <div className="flex gap-2">
-                <button className="bg-orange-500 text-white px-4 py-2 rounded-lg">
+                <button
+                  onClick={() => {
+                    setEditarAlumno(alumno);
+                    setModalAbierto(true);
+                  }}
+                  className="bg-orange-500 text-white px-4 py-2 rounded-lg"
+                >
                   ✏️ Editar
                 </button>
-                <button className="bg-red-500 text-white px-4 py-2 rounded-lg">
+
+                <button
+                  onClick={() => setEliminarAlumno(alumno)}
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                >
                   🗑 Eliminar
                 </button>
               </div>
@@ -190,27 +212,24 @@ export default function AlumnosPage() {
           );
         })}
       </div>
-=======
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-100">
-            <th className="border p-2">Nombre</th>
-            <th className="border p-2">Apellido</th>
-            <th className="border p-2">Nombre del tutor</th>
-            <th className="border p-2">Teléfono del tutor</th>
-          </tr>
-        </thead>
-        <tbody>
-          {alumnos.map((alumno) => (
-            <tr key={alumno.id}>
-              <td className="border p-2">{alumno.nombre}</td>
-              <td className="border p-2">{alumno.apellido}</td>
-              <td className="border p-2">{alumno.tutor_nombre}</td>
-              <td className="border p-2">{alumno.tutor_telefono}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+
+      {/* 👉 Modales */}
+      <AlumnoModal
+        abierto={modalAbierto}
+        alumno={editarAlumno}
+        onCerrar={() => setModalAbierto(false)}
+        onGuardado={() => cargarAlumnos()}
+      />
+
+      <ConfirmDelete
+        abierto={!!eliminarAlumno}
+        onCancelar={() => setEliminarAlumno(null)}
+        onConfirmar={async () => {
+          await apiFetch(`/alumnos/${eliminarAlumno.id}`, { method: "DELETE" });
+          setEliminarAlumno(null);
+          cargarAlumnos();
+        }}
+      />
     </main>
   );
 }

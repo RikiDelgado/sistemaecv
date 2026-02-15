@@ -113,13 +113,13 @@ export default function DashboardPage() {
               </span>
             </div>
 
-            {/* Calendario */}
+            {/* Clases */}
             <div className="bg-[#f1ddbf] rounded-xl p-5 shadow flex flex-col justify-between">
               <div>
                 <div className="text-3xl mb-2">📅</div>
-                <h3 className="font-semibold text-lg">Calendario</h3>
+                <h3 className="font-semibold text-lg">Clases</h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  Programar eventos, reuniones y exámenes
+                  Crear y gestionar horarios, asignaturas y grupos
                 </p>
               </div>
               <span className="mt-4 text-sm text-blue-700 font-medium">
@@ -127,13 +127,13 @@ export default function DashboardPage() {
               </span>
             </div>
 
-            {/* Mi Perfil */}
+            {/* Mi Perfil + Calendario */}
             <div className="bg-[#f1ddbf] rounded-xl p-5 shadow flex flex-col justify-between">
               <div>
                 <div className="text-3xl mb-2">👤</div>
-                <h3 className="font-semibold text-lg">Mi Perfil</h3>
+                <h3 className="font-semibold text-lg">Mi Perfil + Calendario</h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  Actualizar información personal y configuración
+                  Actualizar información personal y calendario académico
                 </p>
               </div>
               <span className="mt-4 text-sm text-purple-700 font-medium">
