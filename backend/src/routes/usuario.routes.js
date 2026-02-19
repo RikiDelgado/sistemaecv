@@ -9,13 +9,13 @@ import {
 } from "../controllers/usuario.controller.js";
 
 import authMiddleware from "../middlewares/auth.middleware.js";
-import { onlyAdmin } from "../middlewares/role.middleware.js";
+import roleMiddleware from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
 // TODAS protegidas
 router.use(authMiddleware);
-router.use(onlyAdmin);
+router.use(roleMiddleware(["admin"]));
 
 router.get("/", getDocentes);
 router.post("/", createUsuario);
