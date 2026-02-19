@@ -2,6 +2,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import { apiFetch } from "../../lib/api";
 import { useAuth } from "../../lib/useAuth";
 import ProfesorCard from "./components/ProfesorCard";
@@ -9,6 +10,7 @@ import ProfesorModal from "./components/ProfesorModal";
 import ProfesorStats from "./components/ProfesorStats";
 
 export default function ProfesoresPage() {
+  const router = useRouter();
   const usuario = useAuth();
 
   const [profesores, setProfesores] = useState<any[]>([]);
@@ -60,6 +62,15 @@ export default function ProfesoresPage() {
 
   return (
     <main className="min-h-screen bg-gradient-to-b from-[#e6c9a8] to-[#f3e6c9] p-6 space-y-6">
+      
+      {/* 🔙 BOTÓN VOLVER */}
+      <button
+        onClick={() => router.push("/dashboard")}
+        className="bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-xl shadow"
+      >
+        ← Volver al Panel Principal
+      </button>
+
       <ProfesorStats
         total={total}
         activos={activos}

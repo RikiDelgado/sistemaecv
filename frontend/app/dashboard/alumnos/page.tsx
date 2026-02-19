@@ -1,7 +1,7 @@
 // frontend/app/dashboard/alumnos/page.tsx
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { apiFetch } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
@@ -22,7 +22,7 @@ function calcularEdad(fecha: string) {
 }
 
 function iniciales(nombre: string, apellido: string) {
-  return `${nombre[0] ?? ""}${apellido[0] ?? ""}`.toUpperCase();
+  return `${nombre?.[0] ?? ""}${apellido?.[0] ?? ""}`.toUpperCase();
 }
 
 function formatearFechaISO(fecha: string) {
@@ -41,11 +41,12 @@ export default function AlumnosPage() {
   const [editarAlumno, setEditarAlumno] = useState<any>(null);
   const [eliminarAlumno, setEliminarAlumno] = useState<any>(null);
 
-  async function cargarAlumnos() {
+  
+  const cargarAlumnos = useCallback(async () => {
     try {
       const data = await apiFetch("/alumnos");
 
-      const ordenados = data.sort((a: any, b: any) =>
+      const ordenados = [...data].sort((a: any, b: any) =>
         a.nombre.localeCompare(b.nombre, "es", { sensitivity: "base" })
       );
 
@@ -56,11 +57,11 @@ export default function AlumnosPage() {
         router.push("/login");
       }
     }
-  }
+  }, [router]);
 
   useEffect(() => {
     cargarAlumnos();
-  }, []);
+  }, [cargarAlumnos]);
 
   const alumnosFiltrados = useMemo(() => {
     return alumnos.filter((a) =>
@@ -70,15 +71,15 @@ export default function AlumnosPage() {
     );
   }, [alumnos, busqueda]);
 
-  const activos = alumnos.filter((a) => a.activo !== false).length;
-  const totalClases = new Set(alumnos.map((a) => a.clase_id).filter(Boolean))
-    .size;
+  const activos = alumnos.length;
+  const totalClases = new Set(
+    alumnos.map((a) => a.clase_id).filter(Boolean)
+  ).size;
 
   if (!usuario) return null;
 
   return (
     <main className="min-h-screen bg-[#f3e2c7] p-6 space-y-6">
-      {/* Header */}
       <div className="flex justify-between items-start gap-4">
         <div>
           <h1 className="text-2xl font-bold text-[#5b3a1d]">
@@ -107,7 +108,6 @@ export default function AlumnosPage() {
         ⬅ Volver al panel principal
       </Link>
 
-      {/* Métricas */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div className="bg-[#f7e7cf] rounded-xl p-4 shadow">
           <p className="text-sm text-[#7a5434]">Total Estudiantes</p>
@@ -131,7 +131,6 @@ export default function AlumnosPage() {
         </div>
       </div>
 
-      {/* Buscador */}
       <input
         type="text"
         placeholder="🔍 Buscar estudiante por nombre o apellido..."
@@ -142,7 +141,6 @@ export default function AlumnosPage() {
 
       {error && <p className="text-red-600">{error}</p>}
 
-      {/* Cards */}
       <div className="space-y-4">
         {alumnosFiltrados.map((alumno) => {
           const edad = calcularEdad(alumno.fecha_nacimiento);
@@ -213,7 +211,9 @@ export default function AlumnosPage() {
         abierto={modalAbierto}
         alumno={editarAlumno}
         onCerrar={() => setModalAbierto(false)}
-        onGuardado={() => cargarAlumnos()}
+        onGuardado={async () => {
+          await cargarAlumnos();
+        }}
       />
 
       <ConfirmDelete
@@ -224,7 +224,7 @@ export default function AlumnosPage() {
             method: "DELETE",
           });
           setEliminarAlumno(null);
-          cargarAlumnos();
+          await cargarAlumnos();
         }}
       />
     </main>

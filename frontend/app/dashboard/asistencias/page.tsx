@@ -5,6 +5,9 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { apiFetch } from "../../lib/api";
 import { useAuth } from "../../lib/useAuth";
+import AsistenciaModal from "./components/AsistenciaModal";
+import BuscarAlumno from "./components/BuscarAlumno";
+import ClaseCard from "./components/ClaseCard";
 
 function formatFecha(fecha: string) {
   return fecha.split("T")[0];
@@ -17,15 +20,47 @@ function esHoy(fecha: string) {
 
 export default function AsistenciasPage() {
   const usuario = useAuth();
-  const [dias, setDias] = useState<any[]>([]);
-  const [error, setError] = useState("");
 
+  const [clases, setClases] = useState<any[]>([]);
+  const [dias, setDias] = useState<any[]>([]);
+  const [claseSeleccionada, setClaseSeleccionada] =
+    useState<any>(null);
+  const [modalAbierto, setModalAbierto] = useState(false);
+  const [error, setError] = useState("");
+  const [vista, setVista] =
+    useState<"lista" | "buscar">("lista");
+
+  /* ===============================
+     CARGA INICIAL
+  =================================*/
   useEffect(() => {
-    apiFetch("/admin/asistencias/dias")
-      .then(setDias)
-      .catch((err) => setError(err.message));
+    cargarClases();
+    cargarDias();
   }, []);
 
+  async function cargarClases() {
+    try {
+      const data = await apiFetch("/clases");
+      setClases(data);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  }
+
+  async function cargarDias() {
+    try {
+      const data = await apiFetch(
+        "/admin/asistencias/dias"
+      );
+      setDias(data);
+    } catch (err: any) {
+      setError(err.message);
+    }
+  }
+
+  /* ===============================
+     MÉTRICAS
+  =================================*/
   const metricas = useMemo(() => {
     const hoy = new Date();
     const mes = hoy.getMonth();
@@ -33,142 +68,244 @@ export default function AsistenciasPage() {
 
     const esteMes = dias.filter((d) => {
       const f = new Date(d.fecha);
-      return f.getMonth() === mes && f.getFullYear() === anio;
+      return (
+        f.getMonth() === mes &&
+        f.getFullYear() === anio
+      );
     });
 
     return {
       total: dias.length,
       esteMes: esteMes.length,
-      clases: 1,
+      clases: clases.length,
       hoy: dias.some((d) => esHoy(d.fecha)) ? 1 : 0,
     };
-  }, [dias]);
+  }, [dias, clases]);
 
   if (!usuario) return null;
 
   return (
     <main className="min-h-screen p-6 space-y-6 bg-[#F6E9CF]">
-      {/* Header */}
-      <Link href="/dashboard" className="text-blue-600 underline">
+      <Link
+        href="/dashboard"
+        className="text-blue-600 underline"
+      >
         ⬅ Volver al panel principal
       </Link>
 
-      <div className="flex flex-col md:flex-row md:justify-between md:items-center gap-4">
-        <div>
-          <h1 className="text-3xl font-bold text-[#6B3E26]">
-            Gestión de Asistencia
-          </h1>
-          <p className="text-[#8B5E3C]">
-            Control de asistencia y reportes de puntualidad
-          </p>
-        </div>
-
-        <Link
-          href="/dashboard/asistencias/nuevo"
-          className="bg-green-600 text-white px-5 py-2 rounded-lg flex items-center gap-2 w-fit"
-        >
-          ➕ Nueva Asistencia
-        </Link>
+      <div>
+        <h1 className="text-3xl font-bold text-[#6B3E26]">
+          Gestión de Asistencia
+        </h1>
+        <p className="text-[#8B5E3C]">
+          Control de asistencia y reportes
+        </p>
       </div>
 
-      {/* Buscador */}
-      <div className="flex items-center gap-3 bg-[#EED9B6] p-4 rounded-xl">
-        <button className="bg-green-600 text-white px-4 py-2 rounded-lg">
+      {/* BOTONES SUPERIORES */}
+      <div className="flex gap-4 bg-[#EED9B6] p-4 rounded-xl">
+        <button
+          onClick={() => {
+            setVista("lista");
+            setClaseSeleccionada(null);
+          }}
+          className={`px-4 py-2 rounded-lg ${
+            vista === "lista"
+              ? "bg-[#6B3E26] text-white"
+              : "bg-gray-200"
+          }`}
+        >
           📋 Lista de Asistencias
         </button>
 
-        <div className="flex-1 flex items-center gap-2 text-[#6B3E26]">
+        <button
+          onClick={() => {
+            setVista("buscar");
+            setClaseSeleccionada(null);
+          }}
+          className={`px-4 py-2 rounded-lg ${
+            vista === "buscar"
+              ? "bg-green-600 text-white"
+              : "bg-gray-200"
+          }`}
+        >
           🔍 Buscar Alumno
-        </div>
+        </button>
       </div>
 
-      {/* Métricas */}
+      {/* MÉTRICAS */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-        <div className="bg-[#F1DDC1] p-4 rounded-xl">
-          <p className="text-sm text-[#8B5E3C]">Total Asistencias</p>
-          <p className="text-2xl font-bold">{metricas.total}</p>
-        </div>
-
-        <div className="bg-[#F1DDC1] p-4 rounded-xl">
-          <p className="text-sm text-[#8B5E3C]">Este Mes</p>
-          <p className="text-2xl font-bold">{metricas.esteMes}</p>
-        </div>
-
-        <div className="bg-[#F1DDC1] p-4 rounded-xl">
-          <p className="text-sm text-[#8B5E3C]">Clases</p>
-          <p className="text-2xl font-bold">{metricas.clases}</p>
-        </div>
-
-        <div className="bg-[#F1DDC1] p-4 rounded-xl">
-          <p className="text-sm text-[#8B5E3C]">Hoy</p>
-          <p className="text-2xl font-bold">{metricas.hoy}</p>
-        </div>
+        <MetricCard
+          label="Total Asistencias"
+          value={metricas.total}
+        />
+        <MetricCard
+          label="Este Mes"
+          value={metricas.esteMes}
+        />
+        <MetricCard
+          label="Clases"
+          value={metricas.clases}
+        />
+        <MetricCard
+          label="Hoy"
+          value={metricas.hoy}
+        />
       </div>
 
-      {/* Lista */}
-      <div className="space-y-4">
-        {dias.map((dia) => (
-          <div
-            key={dia.id}
-            className="bg-[#F3E3C8] rounded-xl p-4 flex flex-col md:flex-row md:justify-between md:items-center gap-4"
+      {/* VISTA BUSCAR */}
+      {vista === "buscar" && <BuscarAlumno />}
+
+      {/* LISTA DE CLASES */}
+      {vista === "lista" && !claseSeleccionada && (
+        <div className="space-y-4">
+          {clases.map((clase) => (
+            <ClaseCard
+              key={clase.id}
+              clase={clase}
+              onClick={setClaseSeleccionada}
+            />
+          ))}
+        </div>
+      )}
+
+      {/* DÍAS DE LA CLASE */}
+      {vista === "lista" && claseSeleccionada && (
+        <div className="space-y-4">
+          <button
+            onClick={() => setClaseSeleccionada(null)}
+            className="text-blue-600 underline"
           >
-            <div className="flex gap-4 items-start">
-              <div className="bg-green-600 text-white rounded-full p-3 text-xl">
-                📋
-              </div>
+            ⬅ Volver a clases
+          </button>
 
-              <div>
-                <h2 className="text-xl font-bold text-[#6B3E26]">
-                  {dia.titulo}
-                </h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-2xl font-bold text-[#6B3E26]">
+              {claseSeleccionada.nombre}
+            </h2>
 
-                <p className="text-sm text-[#8B5E3C]">
-                  📅 {formatFecha(dia.fecha)} &nbsp; 👤 Prof. Admin
-                </p>
-
-                <div className="flex gap-2 mt-2 text-sm">
-                  <span className="bg-blue-200 px-3 py-1 rounded-full">
-                    Clase: —
-                  </span>
-                </div>
-
-                <div className="flex gap-4 mt-3 text-sm">
-                  <span className="text-green-700">
-                    ✅ Presentes: {dia.total_alumnos ?? 0}
-                  </span>
-                  <span className="text-yellow-600">⏰ Tardes: 0</span>
-                  <span className="text-red-600">❌ Ausentes: 0</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex gap-3">
-              <Link
-                href={`/dashboard/asistencias/${dia.id}`}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg"
-              >
-                Tomar asistencia 
-                ✏️ Editar
-              </Link>
-
-              <button
-                onClick={async () => {
-                  if (!confirm("¿Eliminar este día de asistencia?")) return;
-                  await apiFetch(`/admin/asistencias/dias/${dia.id}`, {
-                    method: "DELETE",
-                  });
-                  setDias((prev) =>
-                    prev.filter((d) => d.id !== dia.id)
-                  );
-                }}
-                className="bg-red-600 text-white px-4 py-2 rounded-lg">
-                🗑 Eliminar
-              </button>
-            </div>
+            {/* BOTÓN CREAR ASISTENCIA */}
+            <button
+              onClick={() => setModalAbierto(true)}
+              className="bg-green-600 text-white px-4 py-2 rounded-lg"
+            >
+              ➕ Crear Asistencia
+            </button>
           </div>
-        ))}
-      </div>
-      {error && <p className="text-red-600">{error}</p>}
+
+          {dias
+            .filter(
+              (d) =>
+                d.clase_id === claseSeleccionada.id
+            )
+            .map((dia) => (
+              <div
+                key={dia.id}
+                className="bg-[#F3E3C8] rounded-xl p-4 flex justify-between items-center"
+              >
+                <div>
+                  <h3 className="font-bold">
+                    📅 {formatFecha(dia.fecha)}
+                  </h3>
+
+                  <div className="flex gap-4 mt-2 text-sm">
+                    <span className="text-green-700">
+                      ✅ {dia.presentes ?? 0}
+                    </span>
+                    <span className="text-yellow-600">
+                      ⏰ {dia.tardes ?? 0}
+                    </span>
+                    <span className="text-red-600">
+                      ❌ {dia.ausentes ?? 0}
+                    </span>
+                  </div>
+                </div>
+
+                <div className="flex gap-3">
+                  <button
+                    onClick={() =>
+                      setModalAbierto(true)
+                    }
+                    className="bg-blue-600 text-white px-4 py-2 rounded-lg"
+                  >
+                    {esHoy(dia.fecha)
+                      ? "✏️ Editar"
+                      : "🟢 Tomar"}
+                  </button>
+
+                  <button
+                    onClick={async () => {
+                      if (
+                        !confirm(
+                          "¿Eliminar asistencia?"
+                        )
+                      )
+                        return;
+
+                      await apiFetch(
+                        `/admin/asistencias/dias/${dia.id}`,
+                        {
+                          method: "DELETE",
+                        }
+                      );
+
+                      cargarDias();
+                    }}
+                    className="bg-red-600 text-white px-4 py-2 rounded-lg"
+                  >
+                    🗑
+                  </button>
+                </div>
+              </div>
+            ))}
+
+          {/* BOTÓN SI NO EXISTE ASISTENCIA HOY */}
+          {!dias.some(
+            (d) =>
+              d.clase_id ===
+                claseSeleccionada.id &&
+              esHoy(d.fecha)
+          ) && (
+            <button
+              onClick={() => setModalAbierto(true)}
+              className="bg-green-700 text-white px-5 py-2 rounded-lg"
+            >
+              🟢 Tomar asistencia de hoy
+            </button>
+          )}
+        </div>
+      )}
+
+      <AsistenciaModal
+        abierto={modalAbierto}
+        clase={claseSeleccionada}
+        onCerrar={() => setModalAbierto(false)}
+        onGuardado={cargarDias}
+      />
+
+      {error && (
+        <p className="text-red-600">{error}</p>
+      )}
     </main>
+  );
+}
+
+/* COMPONENTE MÉTRICA */
+function MetricCard({
+  label,
+  value,
+}: {
+  label: string;
+  value: number;
+}) {
+  return (
+    <div className="bg-[#F1DDC1] p-4 rounded-xl">
+      <p className="text-sm text-[#8B5E3C]">
+        {label}
+      </p>
+      <p className="text-2xl font-bold">
+        {value}
+      </p>
+    </div>
   );
 }

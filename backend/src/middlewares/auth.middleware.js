@@ -4,9 +4,9 @@ import jwt from "jsonwebtoken";
 export default function authMiddleware(req, res, next) {
   const authHeader = req.headers.authorization;
 
-  if (!authHeader) {
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
     return res.status(401).json({
-      error: "Token no proporcionado",
+      error: "Token no proporcionado o formato inválido",
     });
   }
 
@@ -21,8 +21,8 @@ export default function authMiddleware(req, res, next) {
     req.user = decoded;
     next();
   } catch (error) {
-    res.status(401).json({
-      error: "Token inválido",
+    return res.status(401).json({
+      error: "Token inválido o expirado",
     });
   }
 }

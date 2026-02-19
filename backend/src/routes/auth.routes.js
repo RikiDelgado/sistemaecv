@@ -6,21 +6,16 @@ import jwt from "jsonwebtoken";
 
 const router = express.Router();
 
-/**
- * POST /auth/login
- */
 router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Validación básica
     if (!email || !password) {
       return res.status(400).json({
         error: "Email y contraseña obligatorios",
       });
     }
 
-    // Buscar usuario
     const result = await pool.query(
       "SELECT * FROM usuarios WHERE email = $1",
       [email]
@@ -34,21 +29,18 @@ router.post("/login", async (req, res) => {
 
     const usuario = result.rows[0];
 
-    // Validar si fue eliminado
     if (usuario.eliminado) {
       return res.status(403).json({
         error: "Usuario eliminado",
       });
     }
 
-    // Validar si está desactivado
     if (usuario.activo === false) {
       return res.status(403).json({
         error: "Usuario desactivado",
       });
     }
 
-    // Comparar contraseña
     const passwordOk = await bcrypt.compare(
       password,
       usuario.password
@@ -60,7 +52,6 @@ router.post("/login", async (req, res) => {
       });
     }
 
-    // Crear token
     const token = jwt.sign(
       {
         id: usuario.id,
@@ -72,7 +63,6 @@ router.post("/login", async (req, res) => {
       { expiresIn: "8h" }
     );
 
-    // Respuesta
     res.json({
       token,
       usuario: {
@@ -82,7 +72,6 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (error) {
-    console.error("Error en login:", error);
     res.status(500).json({
       error: "Error al iniciar sesión",
     });

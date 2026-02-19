@@ -3,46 +3,30 @@ import express from "express";
 import {
   crearClase,
   listarClases,
-  asignarDocenteAClase,
-  verMiClase
+  editarClase,
+  eliminarClase,
+  verMiClase,
 } from "../controllers/clases.controller.js";
+
 import authMiddleware from "../middlewares/auth.middleware.js";
 import roleMiddleware from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
 /**
- * Crear clase (admin)
+ * ============================
+ * ADMIN ROUTES
+ * ============================
  */
-router.post(
-  "/",
-  authMiddleware,
-  roleMiddleware(["admin"]),
-  crearClase
-);
+router.post("/", authMiddleware, roleMiddleware(["admin"]), crearClase);
+router.get("/", authMiddleware, roleMiddleware(["admin"]), listarClases);
+router.put("/:id", authMiddleware, roleMiddleware(["admin"]), editarClase);
+router.delete("/:id", authMiddleware, roleMiddleware(["admin"]), eliminarClase);
 
 /**
- * Listar clases (admin)
- */
-router.get(
-  "/",
-  authMiddleware,
-  roleMiddleware(["admin"]),
-  listarClases
-);
-
-/**
- * Asignar docente a clase (admin)
- */
-router.put(
-  "/:claseId/asignar-docente",
-  authMiddleware,
-  roleMiddleware(["admin"]),
-  asignarDocenteAClase
-);
-
-/**
- * DOCENTE → ver su clase
+ * ============================
+ * DOCENTE ROUTES
+ * ============================
  */
 router.get(
   "/docente/mi-clase",

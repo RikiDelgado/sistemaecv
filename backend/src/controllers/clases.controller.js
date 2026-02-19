@@ -3,46 +3,44 @@ import pool from "../db.js";
 
 /**
  * ============================
- * CLASES
+ * CREAR CLASE (ADMIN)
  * ============================
  */
-
-/**
- * Crear clase
- */
 export async function crearClase(req, res) {
-  const { nombre, capacidad_maxima } = req.body;
+  const { nombre, capacidad_maxima, docente_id } = req.body;
 
   if (!nombre) {
-    return res.status(400).json({
-      error: "El nombre de la clase es obligatorio",
-    });
+    return res.status(400).json({ error: "El nombre es obligatorio" });
   }
 
   try {
     const result = await pool.query(
-      `INSERT INTO clases (nombre, capacidad_maxima)
-       VALUES ($1, COALESCE($2, 20))
-       RETURNING *`,
-      [nombre, capacidad_maxima]
+      `
+      INSERT INTO clases (nombre, capacidad_maxima, docente_id)
+      VALUES ($1, COALESCE($2, 30), $3)
+      RETURNING *
+      `,
+      [nombre, capacidad_maxima, docente_id || null]
     );
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
+    console.error(error);
+
     if (error.code === "23505") {
       return res.status(400).json({
-        error: "Ya existe una clase con ese nombre",
+        error: "Ya existe una clase con ese nombre o docente duplicado",
       });
     }
 
-    res.status(500).json({
-      error: "Error al crear clase",
-    });
+    res.status(500).json({ error: "Error al crear clase" });
   }
 }
 
 /**
- * Listar clases
+ * ============================
+ * LISTAR CLASES (ADMIN)
+ * ============================
  */
 export async function listarClases(req, res) {
   try {
@@ -51,175 +49,116 @@ export async function listarClases(req, res) {
         c.id,
         c.nombre,
         c.capacidad_maxima,
-        u.id AS docente_id,
+        c.docente_id,
         u.nombre AS docente_nombre,
         u.email AS docente_email
       FROM clases c
       LEFT JOIN usuarios u ON u.id = c.docente_id
+      WHERE c.eliminado = false
       ORDER BY c.nombre
     `);
 
     res.json(result.rows);
   } catch (error) {
-    res.status(500).json({
-      error: "Error al obtener clases",
-    });
-  }
-}
-
-/**
- * Asignar docente a clase
- */
-export async function asignarDocenteAClase(req, res) {
-  const { claseId } = req.params;
-  const { docenteId } = req.body;
-
-  if (!docenteId) {
-    return res.status(400).json({
-      error: "docenteId es obligatorio",
-    });
-  }
-
-  try {
-    const docente = await pool.query(
-      `SELECT id FROM usuarios WHERE id = $1 AND rol = 'docente'`,
-      [docenteId]
-    );
-
-    if (docente.rowCount === 0) {
-      return res.status(400).json({
-        error: "El usuario no es docente",
-      });
-    }
-
-    // Quitar clase previa
-    await pool.query(
-      `UPDATE clases SET docente_id = NULL WHERE docente_id = $1`,
-      [docenteId]
-    );
-
-    // Asignar docente a nueva clase
-    await pool.query(
-      `UPDATE clases
-       SET docente_id = $1
-       WHERE id = $2`,
-      [docenteId, claseId]
-    );
-
-    // Guardar clase en usuario
-    await pool.query(
-      `UPDATE usuarios
-       SET clase_id = $1
-       WHERE id = $2`,
-      [claseId, docenteId]
-    );
-
-    res.json({ mensaje: "Docente asignado correctamente" });
-  } catch (error) {
-    res.status(500).json({
-      error: "Error al asignar docente",
-    });
+    console.error(error);
+    res.status(500).json({ error: "Error al obtener clases" });
   }
 }
 
 /**
  * ============================
- * ALUMNOS EN CLASES
+ * EDITAR CLASE (ADMIN)
  * ============================
  */
-
-export async function asignarAlumnoAClase(req, res) {
-  const { claseId, alumnoId } = req.params;
-
-  try {
-    const clase = await pool.query(
-      "SELECT id FROM clases WHERE id = $1",
-      [claseId]
-    );
-
-    if (clase.rowCount === 0) {
-      return res.status(404).json({ error: "Clase no encontrada" });
-    }
-
-    const alumno = await pool.query(
-      "SELECT id FROM alumnos WHERE id = $1",
-      [alumnoId]
-    );
-
-    if (alumno.rowCount === 0) {
-      return res.status(404).json({ error: "Alumno no encontrado" });
-    }
-
-    await pool.query(
-      "UPDATE alumnos SET clase_id = $1 WHERE id = $2",
-      [claseId, alumnoId]
-    );
-
-    res.json({ mensaje: "Alumno asignado a la clase" });
-  } catch (error) {
-    res.status(500).json({ error: "Error al asignar alumno" });
-  }
-}
-
-export async function quitarAlumnoDeClase(req, res) {
-  const { alumnoId } = req.params;
-
-  try {
-    await pool.query(
-      "UPDATE alumnos SET clase_id = NULL WHERE id = $1",
-      [alumnoId]
-    );
-
-    res.json({ mensaje: "Alumno quitado de la clase" });
-  } catch (error) {
-    res.status(500).json({ error: "Error al quitar alumno" });
-  }
-}
-
-export async function listarAlumnosDeClase(req, res) {
-  const { claseId } = req.params;
-
-  try {
-    const result = await pool.query(
-      "SELECT * FROM alumnos WHERE clase_id = $1 ORDER BY nombre",
-      [claseId]
-    );
-
-    res.json(result.rows);
-  } catch (error) {
-    res.status(500).json({ error: "Error al listar alumnos" });
-  }
-}
-
-/**
- * DOCENTE: ver su clase
- */
-export async function verMiClase(req, res) {
-  const { clase_id } = req.user;
-
-  if (!clase_id) {
-    return res.status(404).json({
-      error: "No tenés una clase asignada",
-    });
-  }
+export async function editarClase(req, res) {
+  const { id } = req.params;
+  const { nombre, capacidad_maxima, docente_id } = req.body;
 
   try {
     const result = await pool.query(
       `
-      SELECT
-        id,
-        nombre,
-        capacidad_maxima
-      FROM clases
-      WHERE id = $1
+      UPDATE clases
+      SET nombre = $1,
+          capacidad_maxima = $2,
+          docente_id = $3
+      WHERE id = $4
+      RETURNING *
       `,
-      [clase_id]
+      [nombre, capacidad_maxima, docente_id || null, id]
     );
+
+    if (result.rowCount === 0) {
+      return res.status(404).json({ error: "Clase no encontrada" });
+    }
 
     res.json(result.rows[0]);
   } catch (error) {
-    res.status(500).json({
-      error: "Error al obtener clase del docente",
-    });
+    console.error(error);
+    res.status(500).json({ error: "Error al editar clase" });
+  }
+}
+
+/**
+ * ============================
+ * ELIMINAR CLASE (SOFT DELETE)
+ * ============================
+ */
+export async function eliminarClase(req, res) {
+  const { id } = req.params;
+
+  try {
+    await pool.query(
+      `UPDATE clases SET eliminado = true WHERE id = $1`,
+      [id]
+    );
+
+    // Quitar clase a alumnos
+    await pool.query(
+      `UPDATE alumnos SET clase_id = NULL WHERE clase_id = $1`,
+      [id]
+    );
+
+    // Quitar clase a docentes
+    await pool.query(
+      `UPDATE usuarios SET clase_id = NULL WHERE clase_id = $1`,
+      [id]
+    );
+
+    res.json({ mensaje: "Clase eliminada correctamente" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al eliminar clase" });
+  }
+}
+
+/**
+ * ============================
+ * DOCENTE → VER SU CLASE
+ * ============================
+ * MODELO QUE VOS QUERÉS:
+ * usuarios.clase_id → clases.id
+ */
+export async function verMiClase(req, res) {
+  const docente_id = req.user.id;
+
+  try {
+    const result = await pool.query(
+      `
+      SELECT c.id, c.nombre, c.capacidad_maxima
+      FROM clases c
+      JOIN usuarios u ON u.clase_id = c.id
+      WHERE u.id = $1
+      `,
+      [docente_id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ error: "Docente sin clase asignada" });
+    }
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Error al obtener clase" });
   }
 }
