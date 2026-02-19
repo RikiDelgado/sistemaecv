@@ -28,7 +28,7 @@ export default function EstudiantesPorClase({
     nuevaClaseId: string
   ) {
     try {
-      await apiFetch(`/alumnos/${alumnoId}`, {
+      await apiFetch(`/alumnos/${alumnoId}/clase`, {
         method: "PUT",
         body: JSON.stringify({
           clase_id:
@@ -113,10 +113,7 @@ export default function EstudiantesPorClase({
                   Sin clase
                 </option>
                 {clases.map((c: any) => (
-                  <option
-                    key={c.id}
-                    value={c.id}
-                  >
+                  <option key={c.id} value={c.id}>
                     {c.nombre}
                   </option>
                 ))}

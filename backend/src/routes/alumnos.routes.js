@@ -152,7 +152,43 @@ router.get(
 
 /**
  * ======================
- * PUT /alumnos/:id (EDITAR ALUMNO + CLASE)
+ * PUT /alumnos/:id/clase  ✅ NUEVO ENDPOINT SOLO PARA CLASE
+ * ======================
+ */
+router.put(
+  "/:id/clase",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { clase_id } = req.body;
+
+      const result = await pool.query(
+        `
+        UPDATE alumnos
+        SET clase_id = $1
+        WHERE id = $2
+        RETURNING *
+        `,
+        [clase_id, id]
+      );
+
+      if (!result.rowCount) {
+        return res.status(404).json({ error: "Alumno no encontrado" });
+      }
+
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Error al mover alumno de clase" });
+    }
+  }
+);
+
+/**
+ * ======================
+ * PUT /alumnos/:id (EDITAR ALUMNO COMPLETO)
  * ======================
  */
 router.put(
@@ -178,7 +214,7 @@ router.put(
         alergia_alimento,
         alergia_alimento_detalle,
         talle_remera,
-        clase_id, // ✅ CLASE
+        clase_id,
       } = req.body;
 
       const result = await pool.query(
