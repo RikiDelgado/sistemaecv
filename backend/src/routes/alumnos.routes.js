@@ -31,10 +31,9 @@ router.post("/", async (req, res) => {
       talle_remera,
       talla_remera,
     } = req.body;
-    
+
     const talleFinal = talle_remera ?? talla_remera ?? null;
 
-    // Validaciones mínimas
     if (!nombre || !apellido || !dni || !fecha_nacimiento) {
       return res.status(400).json({
         error: "Faltan datos obligatorios",
@@ -78,7 +77,7 @@ router.post("/", async (req, res) => {
         alergia_medicamento_detalle,
         alergia_alimento,
         alergia_alimento_detalle,
-        talleFinal, // ✅ ACÁ QUEDA CORRECTO
+        talleFinal,
       ]
     );
 
@@ -87,7 +86,6 @@ router.post("/", async (req, res) => {
       alumno: result.rows[0],
     });
   } catch (error) {
-    // DNI duplicado
     if (error.code === "23505") {
       return res.status(409).json({
         error: "El alumno ya está inscripto (DNI duplicado)",
@@ -103,7 +101,6 @@ router.post("/", async (req, res) => {
 
 /**
  * GET /alumnos
- * Lista de alumnos
  */
 router.get(
   "/",
@@ -149,6 +146,125 @@ router.get(
     } catch (error) {
       res.status(500).json({
         error: "Error al obtener alumno",
+      });
+    }
+  }
+);
+
+/**
+ * PUT /alumnos/:id
+ * Actualizar alumno
+ */
+router.put(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const {
+        nombre,
+        apellido,
+        dni,
+        fecha_nacimiento,
+        genero,
+        direccion,
+        tutor_nombre,
+        tutor_apellido,
+        tutor_telefono,
+        alergia_medicamento,
+        alergia_medicamento_detalle,
+        alergia_alimento,
+        alergia_alimento_detalle,
+        talle_remera,
+      } = req.body;
+
+      const result = await pool.query(
+        `
+        UPDATE alumnos SET
+          nombre=$1,
+          apellido=$2,
+          dni=$3,
+          fecha_nacimiento=$4,
+          genero=$5,
+          direccion=$6,
+          tutor_nombre=$7,
+          tutor_apellido=$8,
+          tutor_telefono=$9,
+          alergia_medicamento=$10,
+          alergia_medicamento_detalle=$11,
+          alergia_alimento=$12,
+          alergia_alimento_detalle=$13,
+          talle_remera=$14
+        WHERE id=$15
+        RETURNING *
+        `,
+        [
+          nombre,
+          apellido,
+          dni,
+          fecha_nacimiento,
+          genero,
+          direccion,
+          tutor_nombre,
+          tutor_apellido,
+          tutor_telefono,
+          alergia_medicamento,
+          alergia_medicamento_detalle,
+          alergia_alimento,
+          alergia_alimento_detalle,
+          talle_remera,
+          id,
+        ]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({
+          error: "Alumno no encontrado",
+        });
+      }
+
+      res.json(result.rows[0]);
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        error: "Error al actualizar alumno",
+      });
+    }
+  }
+);
+
+/**
+ * DELETE /alumnos/:id
+ * Eliminar alumno
+ */
+router.delete(
+  "/:id",
+  authMiddleware,
+  roleMiddleware(["admin"]),
+  async (req, res) => {
+    try {
+      const { id } = req.params;
+
+      const result = await pool.query(
+        "DELETE FROM alumnos WHERE id = $1 RETURNING *",
+        [id]
+      );
+
+      if (result.rowCount === 0) {
+        return res.status(404).json({
+          error: "Alumno no encontrado",
+        });
+      }
+
+      res.json({
+        mensaje: "Alumno eliminado correctamente",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({
+        error: "Error al eliminar alumno",
       });
     }
   }

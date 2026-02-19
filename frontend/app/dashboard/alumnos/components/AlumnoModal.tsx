@@ -53,6 +53,24 @@ export default function AlumnoModal({
       [name]: type === "checkbox" ? checked : value,
     });
   }
+  function resetForm() {
+  setForm({
+    nombre: "",
+    apellido: "",
+    dni: "",
+    fecha_nacimiento: "",
+    genero: "",
+    direccion: "",
+    talle_remera: "",
+    tutor_nombre: "",
+    tutor_apellido: "",
+    tutor_telefono: "",
+    alergia_medicamentos: false,
+    detalle_alergia_medicamentos: "",
+    alergia_alimentos: false,
+    detalle_alergia_alimentos: "",
+  });
+}
 
   async function guardar(e: any) {
     e.preventDefault();
@@ -69,9 +87,16 @@ export default function AlumnoModal({
       });
     }
 
+    resetForm();
     onGuardado();
     onCerrar();
   }
+
+  useEffect(() => {
+  if (!abierto) {
+    resetForm();
+  }
+}, [abierto]);
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
