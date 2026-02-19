@@ -52,7 +52,10 @@ export default function DashboardPage() {
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {/* Profesores */}
-            <div className="bg-[#f1ddbf] rounded-xl p-5 shadow flex flex-col justify-between">
+            <Link
+              href="/dashboard/profesores"
+              className="bg-[#f1ddbf] rounded-xl p-5 shadow flex flex-col justify-between hover:scale-[1.02] transition"
+            >
               <div>
                 <div className="text-3xl mb-2">👩‍🏫</div>
                 <h3 className="font-semibold text-lg">Profesores</h3>
@@ -61,9 +64,9 @@ export default function DashboardPage() {
                 </p>
               </div>
               <span className="mt-4 text-sm text-orange-700 font-medium">
-                Próximamente →
+                Abrir módulo →
               </span>
-            </div>
+            </Link>
 
             {/* Estudiantes */}
             <Link

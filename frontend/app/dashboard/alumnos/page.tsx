@@ -6,7 +6,6 @@ import { apiFetch } from "../../lib/api";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "../../lib/useAuth";
-
 import AlumnoModal from "./components/AlumnoModal";
 import ConfirmDelete from "./components/ConfirmDelete";
 
@@ -27,7 +26,7 @@ function iniciales(nombre: string, apellido: string) {
 }
 
 function formatearFechaISO(fecha: string) {
-  return fecha.split("T")[0];
+  return fecha?.split("T")[0];
 }
 
 export default function AlumnosPage() {
@@ -38,12 +37,10 @@ export default function AlumnosPage() {
   const [busqueda, setBusqueda] = useState("");
   const [error, setError] = useState("");
 
-  // 👉 Estados nuevos
   const [modalAbierto, setModalAbierto] = useState(false);
   const [editarAlumno, setEditarAlumno] = useState<any>(null);
   const [eliminarAlumno, setEliminarAlumno] = useState<any>(null);
 
-  // 👉 Función reutilizable (antes estaba dentro del useEffect)
   async function cargarAlumnos() {
     try {
       const data = await apiFetch("/alumnos");
@@ -73,6 +70,10 @@ export default function AlumnosPage() {
     );
   }, [alumnos, busqueda]);
 
+  const activos = alumnos.filter((a) => a.activo !== false).length;
+  const totalClases = new Set(alumnos.map((a) => a.clase_id).filter(Boolean))
+    .size;
+
   if (!usuario) return null;
 
   return (
@@ -88,7 +89,6 @@ export default function AlumnosPage() {
           </p>
         </div>
 
-        {/* 👉 Botón Agregar */}
         <button
           onClick={() => {
             setEditarAlumno(null);
@@ -100,7 +100,6 @@ export default function AlumnosPage() {
         </button>
       </div>
 
-      {/* Volver */}
       <Link
         href="/dashboard"
         className="inline-flex items-center gap-2 bg-[#f7e7cf] px-4 py-2 rounded-xl shadow text-[#5b3a1d] hover:bg-[#eed6b3]"
@@ -120,13 +119,15 @@ export default function AlumnosPage() {
         <div className="bg-[#f7e7cf] rounded-xl p-4 shadow">
           <p className="text-sm text-[#7a5434]">Activos</p>
           <p className="text-2xl font-bold text-green-700">
-            {alumnos.length}
+            {activos}
           </p>
         </div>
 
         <div className="bg-[#f7e7cf] rounded-xl p-4 shadow">
-          <p className="text-sm text-[#7a5434]">Clases</p>
-          <p className="text-2xl font-bold text-[#5b3a1d]">—</p>
+          <p className="text-sm text-[#7a5434]">Clases Asignadas</p>
+          <p className="text-2xl font-bold text-[#5b3a1d]">
+            {totalClases}
+          </p>
         </div>
       </div>
 
@@ -151,7 +152,6 @@ export default function AlumnosPage() {
               key={alumno.id}
               className="bg-[#f7e7cf] rounded-2xl shadow-md p-4 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4"
             >
-              {/* Info */}
               <div className="flex gap-4">
                 <div className="w-14 h-14 rounded-full bg-[#c98b1f] text-white flex items-center justify-center font-bold text-lg">
                   {iniciales(alumno.nombre, alumno.apellido)}
@@ -175,7 +175,6 @@ export default function AlumnosPage() {
                 </div>
               </div>
 
-              {/* Tutor */}
               <div className="text-sm text-[#5b3a1d] space-y-1">
                 <p>
                   👤 Tutor:{" "}
@@ -183,27 +182,24 @@ export default function AlumnosPage() {
                     {alumno.tutor_nombre} {alumno.tutor_apellido}
                   </strong>
                 </p>
-                {alumno.tutor_telefono && (
-                  <p>📞 {alumno.tutor_telefono}</p>
-                )}
+                {alumno.tutor_telefono && <p>📞 {alumno.tutor_telefono}</p>}
                 {alumno.direccion && <p>📍 {alumno.direccion}</p>}
               </div>
 
-              {/* Acciones */}
               <div className="flex gap-2">
                 <button
                   onClick={() => {
                     setEditarAlumno(alumno);
                     setModalAbierto(true);
                   }}
-                  className="bg-orange-500 text-white px-4 py-2 rounded-lg"
+                  className="bg-orange-500 text-white px-4 py-2 rounded-lg hover:bg-orange-600"
                 >
                   ✏️ Editar
                 </button>
 
                 <button
                   onClick={() => setEliminarAlumno(alumno)}
-                  className="bg-red-500 text-white px-4 py-2 rounded-lg"
+                  className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
                 >
                   🗑 Eliminar
                 </button>
@@ -213,7 +209,6 @@ export default function AlumnosPage() {
         })}
       </div>
 
-      {/* 👉 Modales */}
       <AlumnoModal
         abierto={modalAbierto}
         alumno={editarAlumno}
@@ -225,7 +220,9 @@ export default function AlumnosPage() {
         abierto={!!eliminarAlumno}
         onCancelar={() => setEliminarAlumno(null)}
         onConfirmar={async () => {
-          await apiFetch(`/alumnos/${eliminarAlumno.id}`, { method: "DELETE" });
+          await apiFetch(`/alumnos/${eliminarAlumno.id}`, {
+            method: "DELETE",
+          });
           setEliminarAlumno(null);
           cargarAlumnos();
         }}
