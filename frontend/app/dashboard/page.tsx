@@ -114,18 +114,22 @@ export default function DashboardPage() {
             </div>
 
             {/* Clases */}
-            <div className="bg-[#f1ddbf] rounded-xl p-5 shadow flex flex-col justify-between">
+            <Link
+              href="/dashboard/clases"
+              className="bg-[#f1ddbf] rounded-xl p-5 shadow flex flex-col justify-between hover:scale-[1.02] transition"
+            >
               <div>
                 <div className="text-3xl mb-2">📅</div>
                 <h3 className="font-semibold text-lg">Clases</h3>
                 <p className="text-sm text-gray-600 mt-1">
-                  Crear y gestionar horarios, asignaturas y grupos
+                  Crear y gestionar clases y asignaciones docentes
                 </p>
               </div>
               <span className="mt-4 text-sm text-blue-700 font-medium">
-                Próximamente →
+                Abrir módulo →
               </span>
-            </div>
+            </Link>
+
 
             {/* Mi Perfil + Calendario */}
             <div className="bg-[#f1ddbf] rounded-xl p-5 shadow flex flex-col justify-between">

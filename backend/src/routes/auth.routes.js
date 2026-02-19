@@ -1,4 +1,4 @@
-//backend/src/routes/auth.routes.js
+// backend/src/routes/auth.routes.js
 import express from "express";
 import pool from "../db.js";
 import bcrypt from "bcryptjs";
@@ -13,12 +13,14 @@ router.post("/login", async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    // Validación básica
     if (!email || !password) {
       return res.status(400).json({
         error: "Email y contraseña obligatorios",
       });
     }
 
+    // Buscar usuario
     const result = await pool.query(
       "SELECT * FROM usuarios WHERE email = $1",
       [email]
@@ -32,6 +34,21 @@ router.post("/login", async (req, res) => {
 
     const usuario = result.rows[0];
 
+    // Validar si fue eliminado
+    if (usuario.eliminado) {
+      return res.status(403).json({
+        error: "Usuario eliminado",
+      });
+    }
+
+    // Validar si está desactivado
+    if (usuario.activo === false) {
+      return res.status(403).json({
+        error: "Usuario desactivado",
+      });
+    }
+
+    // Comparar contraseña
     const passwordOk = await bcrypt.compare(
       password,
       usuario.password
@@ -43,16 +60,19 @@ router.post("/login", async (req, res) => {
       });
     }
 
+    // Crear token
     const token = jwt.sign(
       {
         id: usuario.id,
         rol: usuario.rol,
         nombre: usuario.nombre,
+        clase_id: usuario.clase_id || null,
       },
       process.env.JWT_SECRET,
       { expiresIn: "8h" }
     );
 
+    // Respuesta
     res.json({
       token,
       usuario: {
@@ -62,6 +82,7 @@ router.post("/login", async (req, res) => {
       },
     });
   } catch (error) {
+    console.error("Error en login:", error);
     res.status(500).json({
       error: "Error al iniciar sesión",
     });

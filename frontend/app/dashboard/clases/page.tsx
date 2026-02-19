@@ -1,4 +1,4 @@
-//frontend/app/dashboard/tribus/page.tsx
+//frontend/app/dashboard/clases/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -6,10 +6,10 @@ import Link from "next/link";
 import { apiFetch } from "../../lib/api";
 import { useAuth } from "../../lib/useAuth";
 
-export default function TribusPage() {
+export default function ClasesPage() {
   const usuario = useAuth();
 
-  const [tribus, setTribus] = useState<any[]>([]);
+  const [clases, setClases] = useState<any[]>([]);
   const [docentes, setDocentes] = useState<any[]>([]);
   const [seleccion, setSeleccion] = useState<Record<number, number>>({});
   const [nombre, setNombre] = useState("");
@@ -17,8 +17,8 @@ export default function TribusPage() {
   const [mensaje, setMensaje] = useState("");
 
   useEffect(() => {
-    apiFetch("/tribus")
-      .then(setTribus)
+    apiFetch("/clases")
+      .then(setClases)
       .catch((err) => setError(err.message));
 
     apiFetch("/usuarios?rol=docente")
@@ -26,37 +26,37 @@ export default function TribusPage() {
       .catch(() => {});
   }, []);
 
-  async function crearTribu(e: React.FormEvent) {
+  async function crearClase(e: React.FormEvent) {
     e.preventDefault();
     setError("");
 
     try {
-      const nueva = await apiFetch("/tribus", {
+      const nueva = await apiFetch("/clases", {
         method: "POST",
         body: JSON.stringify({ nombre }),
       });
 
-      setTribus((prev) => [...prev, nueva]);
+      setClases((prev) => [...prev, nueva]);
       setNombre("");
     } catch (err: any) {
       setError(err.message);
     }
   }
 
-  async function asignarDocente(tribuId: number) {
-    const docenteId = seleccion[tribuId];
+  async function asignarDocente(claseId: number) {
+    const docenteId = seleccion[claseId];
     if (!docenteId) return;
 
     try {
-      await apiFetch(`/tribus/${tribuId}/asignar-docente`, {
+      await apiFetch(`/clases/${claseId}/asignar-docente`, {
         method: "POST",
         body: JSON.stringify({ docenteId }),
       });
 
       setMensaje("Docente asignado correctamente");
 
-      const nuevasTribus = await apiFetch("/tribus");
-      setTribus(nuevasTribus);
+      const nuevasClases = await apiFetch("/clases");
+      setClases(nuevasClases);
     } catch (err: any) {
       setError(err.message);
     }
@@ -70,16 +70,16 @@ export default function TribusPage() {
         ⬅ Volver al panel principal
       </Link>
 
-      <h1 className="text-2xl font-bold">Gestión de tribus</h1>
+      <h1 className="text-2xl font-bold">Gestión de clases</h1>
 
       {error && <p className="text-red-600">{error}</p>}
       {mensaje && <p className="text-green-600">{mensaje}</p>}
 
-      {/* Crear tribu */}
-      <form onSubmit={crearTribu} className="flex gap-2">
+      {/* Crear clase */}
+      <form onSubmit={crearClase} className="flex gap-2">
         <input
           className="border p-2 rounded flex-1"
-          placeholder="Nombre de la tribu"
+          placeholder="Nombre de la clase"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           required
@@ -91,13 +91,13 @@ export default function TribusPage() {
 
       {/* Listado */}
       <ul className="space-y-4">
-        {tribus.map((tribu) => (
-          <li key={tribu.id} className="border p-4 rounded space-y-2">
-            <div className="font-semibold">{tribu.nombre}</div>
+        {clases.map((clase) => (
+          <li key={clase.id} className="border p-4 rounded space-y-2">
+            <div className="font-semibold">{clase.nombre}</div>
 
             <div className="text-sm text-gray-600">
-              {tribu.docente_nombre
-                ? `Docente: ${tribu.docente_nombre}`
+              {clase.docente_nombre
+                ? `Docente: ${clase.docente_nombre}`
                 : "Sin docente"}
             </div>
 
@@ -107,7 +107,7 @@ export default function TribusPage() {
               onChange={(e) =>
                 setSeleccion({
                   ...seleccion,
-                  [tribu.id]: Number(e.target.value),
+                  [clase.id]: Number(e.target.value),
                 })
               }
             >
@@ -120,7 +120,7 @@ export default function TribusPage() {
             </select>
 
             <button
-              onClick={() => asignarDocente(tribu.id)}
+              onClick={() => asignarDocente(clase.id)}
               className="bg-green-600 text-white px-3 py-1 rounded"
             >
               Asignar

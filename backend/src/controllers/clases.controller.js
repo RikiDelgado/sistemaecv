@@ -1,77 +1,77 @@
-//backend/src/controllers/tribus.controller.js
+//backend/src/controllers/clases.controller.js
 import pool from "../db.js";
 
 /**
  * ============================
- * TRIBUS
+ * CLASES
  * ============================
  */
 
 /**
- * Crear tribu
+ * Crear clase
  */
-export async function crearTribu(req, res) {
-  const { nombre } = req.body;
+export async function crearClase(req, res) {
+  const { nombre, capacidad_maxima } = req.body;
 
   if (!nombre) {
     return res.status(400).json({
-      error: "El nombre de la tribu es obligatorio",
+      error: "El nombre de la clase es obligatorio",
     });
   }
 
   try {
     const result = await pool.query(
-      `INSERT INTO tribus (nombre)
-       VALUES ($1)
+      `INSERT INTO clases (nombre, capacidad_maxima)
+       VALUES ($1, COALESCE($2, 20))
        RETURNING *`,
-      [nombre]
+      [nombre, capacidad_maxima]
     );
 
     res.status(201).json(result.rows[0]);
   } catch (error) {
     if (error.code === "23505") {
       return res.status(400).json({
-        error: "Ya existe una tribu con ese nombre",
+        error: "Ya existe una clase con ese nombre",
       });
     }
 
     res.status(500).json({
-      error: "Error al crear tribu",
+      error: "Error al crear clase",
     });
   }
 }
 
 /**
- * Listar tribus
+ * Listar clases
  */
-export async function listarTribus(req, res) {
+export async function listarClases(req, res) {
   try {
     const result = await pool.query(`
       SELECT
-        t.id,
-        t.nombre,
+        c.id,
+        c.nombre,
+        c.capacidad_maxima,
         u.id AS docente_id,
         u.nombre AS docente_nombre,
         u.email AS docente_email
-      FROM tribus t
-      LEFT JOIN usuarios u ON u.id = t.docente_id
-      ORDER BY t.nombre
+      FROM clases c
+      LEFT JOIN usuarios u ON u.id = c.docente_id
+      ORDER BY c.nombre
     `);
 
     res.json(result.rows);
   } catch (error) {
     res.status(500).json({
-      error: "Error al obtener tribus",
+      error: "Error al obtener clases",
     });
   }
 }
 
 /**
- * Asignar docente a tribu
- * (un docente solo puede tener UNA tribu)
+ * Asignar docente a clase
  */
-export async function asignarDocente(req, res) {
-  const { tribuId } = req.params;
+export async function asignarDocenteAClase(req, res) {
+  const { claseId } = req.params;
   const { docenteId } = req.body;
 
   if (!docenteId) {
@@ -81,7 +81,6 @@ export async function asignarDocente(req, res) {
   }
 
   try {
-    // Verificar que el usuario sea docente
     const docente = await pool.query(
       `SELECT id FROM usuarios WHERE id = $1 AND rol = 'docente'`,
       [docenteId]
@@ -93,26 +92,26 @@ export async function asignarDocente(req, res) {
       });
     }
 
-    // Quitar tribu previa si existía
+    // Quitar clase previa
     await pool.query(
-      `UPDATE tribus SET docente_id = NULL WHERE docente_id = $1`,
+      `UPDATE clases SET docente_id = NULL WHERE docente_id = $1`,
       [docenteId]
     );
 
-    // Asignar docente a tribu
+    // Asignar docente a nueva clase
     await pool.query(
-      `UPDATE tribus
+      `UPDATE clases
        SET docente_id = $1
        WHERE id = $2`,
-      [docenteId, tribuId]
+      [docenteId, claseId]
     );
 
-    // Guardar tribu en el docente
+    // Guardar clase en usuario
     await pool.query(
       `UPDATE usuarios
-       SET tribu_id = $1
+       SET clase_id = $1
        WHERE id = $2`,
-      [tribuId, docenteId]
+      [claseId, docenteId]
     );
 
     res.json({ mensaje: "Docente asignado correctamente" });
@@ -125,24 +124,21 @@ export async function asignarDocente(req, res) {
 
 /**
  * ============================
- * ALUMNOS EN TRIBUS
+ * ALUMNOS EN CLASES
  * ============================
  */
 
-/**
- * Asignar alumno a tribu
- */
-export async function asignarAlumnoATribu(req, res) {
-  const { tribuId, alumnoId } = req.params;
+export async function asignarAlumnoAClase(req, res) {
+  const { claseId, alumnoId } = req.params;
 
   try {
-    const tribu = await pool.query(
-      "SELECT id FROM tribus WHERE id = $1",
-      [tribuId]
+    const clase = await pool.query(
+      "SELECT id FROM clases WHERE id = $1",
+      [claseId]
     );
 
-    if (tribu.rowCount === 0) {
-      return res.status(404).json({ error: "Tribu no encontrada" });
+    if (clase.rowCount === 0) {
+      return res.status(404).json({ error: "Clase no encontrada" });
     }
 
     const alumno = await pool.query(
@@ -155,44 +151,38 @@ export async function asignarAlumnoATribu(req, res) {
     }
 
     await pool.query(
-      "UPDATE alumnos SET tribu_id = $1 WHERE id = $2",
-      [tribuId, alumnoId]
+      "UPDATE alumnos SET clase_id = $1 WHERE id = $2",
+      [claseId, alumnoId]
     );
 
-    res.json({ mensaje: "Alumno asignado a la tribu" });
+    res.json({ mensaje: "Alumno asignado a la clase" });
   } catch (error) {
     res.status(500).json({ error: "Error al asignar alumno" });
   }
 }
 
-/**
- * Quitar alumno de tribu
- */
-export async function quitarAlumnoDeTribu(req, res) {
+export async function quitarAlumnoDeClase(req, res) {
   const { alumnoId } = req.params;
 
   try {
     await pool.query(
-      "UPDATE alumnos SET tribu_id = NULL WHERE id = $1",
+      "UPDATE alumnos SET clase_id = NULL WHERE id = $1",
       [alumnoId]
     );
 
-    res.json({ mensaje: "Alumno quitado de la tribu" });
+    res.json({ mensaje: "Alumno quitado de la clase" });
   } catch (error) {
     res.status(500).json({ error: "Error al quitar alumno" });
   }
 }
 
-/**
- * Listar alumnos de una tribu
- */
-export async function listarAlumnosDeTribu(req, res) {
-  const { tribuId } = req.params;
+export async function listarAlumnosDeClase(req, res) {
+  const { claseId } = req.params;
 
   try {
     const result = await pool.query(
-      "SELECT * FROM alumnos WHERE tribu_id = $1 ORDER BY nombre",
-      [tribuId]
+      "SELECT * FROM alumnos WHERE clase_id = $1 ORDER BY nombre",
+      [claseId]
     );
 
     res.json(result.rows);
@@ -201,16 +191,15 @@ export async function listarAlumnosDeTribu(req, res) {
   }
 }
 
-
 /**
- * DOCENTE: ver su tribu
+ * DOCENTE: ver su clase
  */
-export async function verMiTribu(req, res) {
-  const { tribu_id } = req.user;
+export async function verMiClase(req, res) {
+  const { clase_id } = req.user;
 
-  if (!tribu_id) {
+  if (!clase_id) {
     return res.status(404).json({
-      error: "No tenés una tribu asignada",
+      error: "No tenés una clase asignada",
     });
   }
 
@@ -218,18 +207,19 @@ export async function verMiTribu(req, res) {
     const result = await pool.query(
       `
       SELECT
-        t.id,
-        t.nombre
-      FROM tribus t
-      WHERE t.id = $1
+        id,
+        nombre,
+        capacidad_maxima
+      FROM clases
+      WHERE id = $1
       `,
-      [tribu_id]
+      [clase_id]
     );
 
     res.json(result.rows[0]);
   } catch (error) {
     res.status(500).json({
-      error: "Error al obtener tribu del docente",
+      error: "Error al obtener clase del docente",
     });
   }
 }

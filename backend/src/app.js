@@ -7,7 +7,8 @@ import pool from "./db.js";
 import alumnosRoutes from "./routes/alumnos.routes.js";
 import authRoutes from "./routes/auth.routes.js";
 import asistenciasAdminRoutes from "./routes/asistenciasAdmin.routes.js";
-import tribusRoutes from "./routes/tribus.routes.js";
+import clasesRoutes from "./routes/clases.routes.js";
+import usuarioRoutes from "./routes/usuario.routes.js";
 
 
 dotenv.config();
@@ -15,14 +16,13 @@ dotenv.config();
 const app = express();
 
 /* =====================
-   MIDDLEWARES CLAVE
+   MIDDLEWARES
 ===================== */
-app.use("/tribus", tribusRoutes);
 
-// JSON (obligatorio)
+// JSON (OBLIGATORIO)
 app.use(express.json());
 
-// CORS abierto (correcto para Render + Vercel)
+// CORS (Render + Vercel)
 app.use(
   cors({
     origin: "*",
@@ -39,8 +39,15 @@ app.use("/auth", authRoutes);
 // Alumnos
 app.use("/alumnos", alumnosRoutes);
 
+// Clases
+app.use("/clases", clasesRoutes);
+
 // Asistencias ADMIN / DOCENTE
 app.use("/admin/asistencias", asistenciasAdminRoutes);
+
+// Profesores
+app.use("/usuarios", usuarioRoutes);
+
 
 /* =====================
    RUTA TEST

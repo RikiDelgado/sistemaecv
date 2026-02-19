@@ -1,54 +1,54 @@
-//backend/src/routes/tribus.routes.js
+//backend/src/routes/clases.routes.js
 import express from "express";
 import {
-  crearTribu,
-  listarTribus,
-  asignarDocente,
-  verMiTribu
-} from "../controllers/tribus.controller.js";
+  crearClase,
+  listarClases,
+  asignarDocenteAClase,
+  verMiClase
+} from "../controllers/clases.controller.js";
 import authMiddleware from "../middlewares/auth.middleware.js";
 import roleMiddleware from "../middlewares/role.middleware.js";
 
 const router = express.Router();
 
 /**
- * Crear tribu (admin)
+ * Crear clase (admin)
  */
 router.post(
   "/",
   authMiddleware,
   roleMiddleware(["admin"]),
-  crearTribu
+  crearClase
 );
 
 /**
- * Listar tribus (admin)
+ * Listar clases (admin)
  */
 router.get(
   "/",
   authMiddleware,
   roleMiddleware(["admin"]),
-  listarTribus
+  listarClases
 );
 
 /**
- * Asignar docente a tribu (admin)
+ * Asignar docente a clase (admin)
  */
 router.put(
-  "/:tribuId/asignar-docente",
+  "/:claseId/asignar-docente",
   authMiddleware,
   roleMiddleware(["admin"]),
-  asignarDocente
+  asignarDocenteAClase
 );
 
 /**
- * DOCENTE → ver su tribu
+ * DOCENTE → ver su clase
  */
 router.get(
-  "/docente/mi-tribu",
+  "/docente/mi-clase",
   authMiddleware,
   roleMiddleware(["docente"]),
-  verMiTribu
+  verMiClase
 );
 
 export default router;

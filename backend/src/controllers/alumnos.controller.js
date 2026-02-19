@@ -2,14 +2,14 @@
 import pool from "../db.js";
 
 /**
- * DOCENTE: listar alumnos de SU tribu
+ * DOCENTE: listar alumnos de SU clase
  */
 export async function listarMisAlumnos(req, res) {
-  const { tribu_id } = req.user;
+  const { clase_id } = req.user;
 
-  if (!tribu_id) {
+  if (!clase_id) {
     return res.status(403).json({
-      error: "No tenés tribu asignada",
+      error: "No tenés clase asignada",
     });
   }
 
@@ -23,10 +23,10 @@ export async function listarMisAlumnos(req, res) {
         dni,
         talle_remera
       FROM alumnos
-      WHERE tribu_id = $1
+      WHERE clase_id = $1
       ORDER BY apellido, nombre
       `,
-      [tribu_id]
+      [clase_id]
     );
 
     res.json(result.rows);
