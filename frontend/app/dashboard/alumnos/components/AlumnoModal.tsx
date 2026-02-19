@@ -43,7 +43,6 @@ export default function AlumnoModal({
     }
   }, [alumno]);
 
-  if (!abierto) return null;
 
   function cambiar(e: any) {
     const { name, value, type, checked } = e.target;
@@ -65,10 +64,10 @@ export default function AlumnoModal({
     tutor_nombre: "",
     tutor_apellido: "",
     tutor_telefono: "",
-    alergia_medicamentos: false,
-    detalle_alergia_medicamentos: "",
-    alergia_alimentos: false,
-    detalle_alergia_alimentos: "",
+    alergia_medicamento: false,
+    alergia_medicamento_detalle: "",
+    alergia_alimento: false,
+    alergia_alimento_detalle: "",
   });
 }
 
@@ -97,6 +96,7 @@ export default function AlumnoModal({
     resetForm();
   }
 }, [abierto]);
+  if (!abierto) return null;
 
   return (
     <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
@@ -198,17 +198,17 @@ export default function AlumnoModal({
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    name="alergia_medicamentos"
-                    checked={form.alergia_medicamentos}
+                    name="alergia_medicamento"
+                    checked={form.alergia_medicamento}
                     onChange={cambiar}
                   />
                   ¿Alergia a medicamentos?
                 </label>
 
-                {form.alergia_medicamentos && (
+                {form.alergia_medicamento && (
                   <input
-                    name="detalle_alergia_medicamentos"
-                    value={form.detalle_alergia_medicamentos}
+                    name="alergia_medicamento_detalle"
+                    value={form.alergia_medicamento_detalle}
                     onChange={cambiar}
                     placeholder="¿Cuál?"
                     className="input-style mt-2"
@@ -221,17 +221,17 @@ export default function AlumnoModal({
                 <label className="flex items-center gap-2">
                   <input
                     type="checkbox"
-                    name="alergia_alimentos"
-                    checked={form.alergia_alimentos}
+                    name="alergia_alimento"
+                    checked={form.alergia_alimento}
                     onChange={cambiar}
                   />
                   ¿Alergia a alimentos?
                 </label>
 
-                {form.alergia_alimentos && (
+                {form.alergia_alimento && (
                   <input
-                    name="detalle_alergia_alimentos"
-                    value={form.detalle_alergia_alimentos}
+                    name="alergia_alimento_detalle"
+                    value={form.alergia_alimento_detalle}
                     onChange={cambiar}
                     placeholder="¿Cuál?"
                     className="input-style mt-2"
