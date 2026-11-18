@@ -6,6 +6,14 @@ import { useRouter } from "next/navigation";
 import { apiFetch } from "@/lib/api";
 import toast, { Toaster } from "react-hot-toast";
 
+import {
+  Eye,
+  EyeOff,
+  Mail,
+  LockKeyhole,
+  LoaderCircle,
+} from "lucide-react";
+
 export default function LoginPage() {
   const router = useRouter();
 
@@ -14,10 +22,10 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem("rememberEmail");
+
     if (saved) {
       setEmail(saved);
       setRemember(true);
@@ -28,7 +36,7 @@ export default function LoginPage() {
     e.preventDefault();
 
     if (!email || !password) {
-      toast.error("Completa todos los campos");
+      toast.error("Completá todos los campos");
       return;
     }
 
@@ -41,7 +49,10 @@ export default function LoginPage() {
       });
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("usuario", JSON.stringify(data.usuario));
+      localStorage.setItem(
+        "usuario",
+        JSON.stringify(data.usuario)
+      );
 
       if (remember) {
         localStorage.setItem("rememberEmail", email);
@@ -49,117 +60,163 @@ export default function LoginPage() {
         localStorage.removeItem("rememberEmail");
       }
 
-      toast.success("Bienvenido ðŸ™Œ");
+      toast.success("Bienvenido al sistema");
       router.push("/dashboard");
-    } catch (err: any) {
-      toast.error(err.message || "Error al iniciar sesiÃ³n");
+
+    } catch (err: unknown) {
+      toast.error(
+        err instanceof Error
+          ? err.message
+          : "Error al iniciar sesión"
+      );
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <main
-      className={`min-h-screen flex items-center justify-center transition ${
-        darkMode
-          ? "bg-gradient-to-br from-gray-900 to-black"
-          : "bg-gradient-to-br from-yellow-200 via-orange-200 to-amber-300"
-      }`}
-    >
-      <Toaster />
+    <main className="min-h-screen bg-gradient-to-br from-[#142b48] via-blue-900 to-sky-700 flex items-center justify-center p-5">
 
-      <div className="w-full max-w-sm">
+      <Toaster position="top-center" />
+
+      <div className="w-full max-w-md">
+
         <form
           onSubmit={handleSubmit}
-          className={`p-8 rounded-2xl shadow-2xl space-y-5 border backdrop-blur-md ${
-            darkMode ? "bg-gray-800 text-white" : "bg-white/80"
-          }`}
+          className="bg-white rounded-3xl shadow-2xl p-7 sm:p-10 space-y-6 text-slate-800"
         >
-          {/* ðŸŒ™ Toggle Dark Mode */}
-          <div className="flex justify-end">
-            <button
-              type="button"
-              onClick={() => setDarkMode(!darkMode)}
-              className="text-sm"
-            >
-              {darkMode ? "â˜€ï¸" : "ðŸŒ™"}
-            </button>
-          </div>
 
-          {/* ðŸœï¸ LOGO */}
           <div className="text-center">
+
             <img
               src="/logo-mm.jpg"
-              alt="Ministerio"
-              className="mx-auto w-16 mb-2"
+              alt="Ministerio Infantil"
+              className="mx-auto w-20 h-20 rounded-2xl object-cover mb-5"
             />
-            <h1 className="text-2xl font-bold">
-              Sistema de GestiÃ³n
+
+            <h1 className="text-2xl font-bold text-slate-900">
+              Sistema de Gestión
             </h1>
-            
-            <p className="text-sm opacity-70">
+
+            <p className="text-sm text-slate-500 mt-1">
               Ministerio Infantil
             </p>
+
           </div>
 
-          {/* EMAIL */}
-          <div>
-            <label className="text-sm">Correo</label>
-            <input
-              type="email"
-              placeholder="correo@email.com"
-              className="w-full p-2 rounded-lg border focus:ring-2 focus:ring-orange-400 outline-none"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
-          </div>
+          <div className="border-t border-slate-100" />
 
-          {/* PASSWORD */}
           <div>
-            <label className="text-sm">ContraseÃ±a</label>
+
+            <label
+              htmlFor="email"
+              className="text-sm font-medium block mb-2"
+            >
+              Correo electrónico
+            </label>
+
             <div className="relative">
+
+              <Mail
+                size={18}
+                className="absolute left-3 top-3.5 text-slate-400"
+              />
+
               <input
+                id="email"
+                type="email"
+                autoComplete="username"
+                required
+                placeholder="correo@ejemplo.com"
+                className="w-full border border-slate-300 rounded-xl pl-10 pr-3 py-3 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+              />
+
+            </div>
+
+          </div>
+
+          <div>
+
+            <label
+              htmlFor="password"
+              className="text-sm font-medium block mb-2"
+            >
+              Contraseña
+            </label>
+
+            <div className="relative">
+
+              <LockKeyhole
+                size={18}
+                className="absolute left-3 top-3.5 text-slate-400"
+              />
+
+              <input
+                id="password"
                 type={showPassword ? "text" : "password"}
-                placeholder="â€¢â€¢â€¢â€¢â€¢â€¢â€¢â€¢"
-                className="w-full p-2 rounded-lg border focus:ring-2 focus:ring-orange-400 outline-none"
+                autoComplete="current-password"
+                required
+                placeholder="Ingresá tu contraseña"
+                className="w-full border border-slate-300 rounded-xl pl-10 pr-11 py-3 focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+
               <button
                 type="button"
                 onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-2 top-2 text-sm"
+                aria-label={showPassword ? "Ocultar contraseña" : "Mostrar contraseña"}
+                className="absolute right-3 top-3.5 text-slate-500"
               >
-                {showPassword ? "ðŸ‘ï¸" : "ðŸ™ˆ"}
+                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
               </button>
+
             </div>
+
           </div>
 
-          {/* RECORDARME */}
-          <div className="flex items-center gap-2 text-sm">
+          <label className="flex items-center gap-2 text-sm text-slate-600 cursor-pointer">
             <input
               type="checkbox"
+              className="accent-blue-700 w-4 h-4"
               checked={remember}
-              onChange={() => setRemember(!remember)}
+              onChange={(e) => setRemember(e.target.checked)}
             />
-            <span>Recordarme</span>
-          </div>
+            Recordar mi correo
+          </label>
 
-          {/* BOTÃ“N */}
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-orange-500 hover:bg-orange-600 text-white p-2 rounded-lg font-semibold transition"
+            className="w-full bg-blue-700 hover:bg-blue-800 disabled:opacity-60 text-white rounded-xl py-3 font-semibold transition flex justify-center items-center gap-2"
           >
-            {loading ? "Entrando..." : "Ingresar"}
+            {loading && (
+              <LoaderCircle size={18} className="animate-spin" />
+            )}
+
+            {loading ? "Ingresando..." : "Iniciar sesión"}
           </button>
 
-          {/* FOOTER */}
-          <p className="text-xs text-center opacity-70">
-            "JehovÃ¡ es mi pastor; nada me faltarÃ¡" ðŸœï¸
-          </p>
+          <div className="text-center border-t border-slate-100 pt-5">
+            <p className="text-xs text-slate-500 italic">
+              Jehová es mi pastor; nada me faltará.
+            </p>
+
+            <p className="text-xs text-slate-400 mt-1">
+              Salmos 23:1
+            </p>
+          </div>
+
         </form>
+
+        <p className="text-center text-xs text-blue-100 mt-6">
+          Sistema de Gestión | Ministerio Infantil
+        </p>
+
       </div>
+
     </main>
   );
 }

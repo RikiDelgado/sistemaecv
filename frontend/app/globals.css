@@ -3,8 +3,12 @@
 @tailwind utilities;
 
 body {
-  background-color: #F5E6C8;
+  margin: 0;
+  background-color: #f1f5f9;
+  color: #1e293b;
+  font-family: var(--font-geist-sans), Arial, sans-serif;
 }
-body {
-  @apply bg-sand text-gray-800;
+
+button:disabled {
+  cursor: not-allowed;
 }
