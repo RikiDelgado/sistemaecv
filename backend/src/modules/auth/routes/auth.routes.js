@@ -12,7 +12,7 @@ router.post("/login", async (req, res) => {
 
     if (!email || !password) {
       return res.status(400).json({
-        error: "Email y contraseÃ±a obligatorios",
+        error: "Email y contraseña obligatorios",
       });
     }
 
@@ -23,7 +23,7 @@ router.post("/login", async (req, res) => {
 
     if (result.rows.length === 0) {
       return res.status(401).json({
-        error: "Credenciales invÃ¡lidas",
+        error: "Credenciales inválidas",
       });
     }
 
@@ -48,7 +48,7 @@ router.post("/login", async (req, res) => {
 
     if (!passwordOk) {
       return res.status(401).json({
-        error: "Credenciales invÃ¡lidas",
+        error: "Credenciales inválidas",
       });
     }
 
@@ -73,7 +73,7 @@ router.post("/login", async (req, res) => {
     });
   } catch (error) {
     res.status(500).json({
-      error: "Error al iniciar sesiÃ³n",
+      error: "Error al iniciar sesión",
     });
   }
 });
